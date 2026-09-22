@@ -1,9 +1,9 @@
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Alert, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Globe, Briefcase, Settings as SettingsIcon, LogOut, ChevronRight, Phone, ShieldCheck } from 'lucide-react-native';
-import { useAuth } from '../../context/AuthContext.js';
-import { useTranslation } from '../../utils/i18n.js';
-import { Avatar } from '../../components/Avatar.js';
+import { useAuth } from '../../context/AuthContext';
+import { useTranslation } from '../../utils/i18n';
+import { Avatar } from '../../components/Avatar';
 
 export default function ProfileTabScreen() {
   const router = useRouter();

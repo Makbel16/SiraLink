@@ -11,14 +11,14 @@ import {
 import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { MapPin, Bell, SlidersHorizontal } from 'lucide-react-native';
-import { api } from '../../services/api.js';
-import { useAuth } from '../../context/AuthContext.js';
-import { useLocation } from '../../context/LocationContext.js';
-import { useTranslation } from '../../utils/i18n.js';
-import { VoiceRecorder } from '../../components/VoiceRecorder.js';
-import { MapView } from '../../components/MapView.js';
-import { LoadingState } from '../../components/LoadingState.js';
-import { JobCategory, NearbyWorker, TranscriptionResult } from '../../types/index.js';
+import { api } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
+import { useLocation } from '../../context/LocationContext';
+import { useTranslation } from '../../utils/i18n';
+import { VoiceRecorder } from '../../components/VoiceRecorder';
+import { MapView } from '../../components/MapView';
+import { LoadingState } from '../../components/LoadingState';
+import { JobCategory, NearbyWorker, TranscriptionResult } from '../../types/index';
 
 export default function ClientHomeScreen() {
   const router = useRouter();

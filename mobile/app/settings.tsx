@@ -3,8 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, Ale
 import { useRouter } from 'expo-router';
 import { Wifi, Server, Trash2, Globe, Shield, Info, ArrowLeft } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useTranslation } from '../utils/i18n.js';
-import { Button } from '../components/Button.js';
+import { useTranslation } from '../utils/i18n';
+import { Button } from '../components/Button';
 
 export default function SettingsScreen() {
   const router = useRouter();

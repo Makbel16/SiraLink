@@ -2,13 +2,13 @@ import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, Ale
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { Star, MapPin, Briefcase, Phone, CheckCircle2 } from 'lucide-react-native';
-import { api } from '../../services/api.js';
-import { useTranslation } from '../../utils/i18n.js';
-import { Avatar } from '../../components/Avatar.js';
-import { Button } from '../../components/Button.js';
-import { VoicePlayer } from '../../components/VoicePlayer.js';
-import { LoadingState } from '../../components/LoadingState.js';
-import { ErrorState } from '../../components/ErrorState.js';
+import { api } from '../../services/api';
+import { useTranslation } from '../../utils/i18n';
+import { Avatar } from '../../components/Avatar';
+import { Button } from '../../components/Button';
+import { VoicePlayer } from '../../components/VoicePlayer';
+import { LoadingState } from '../../components/LoadingState';
+import { ErrorState } from '../../components/ErrorState';
 
 export default function WorkerProfileScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();

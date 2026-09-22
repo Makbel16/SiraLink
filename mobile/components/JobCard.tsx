@@ -1,8 +1,8 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Calendar, User, Wrench, ChevronRight } from 'lucide-react-native';
-import { JobRequest, JobStatus } from '../types/index.js';
-import { Badge } from './Badge.js';
-import { useTranslation } from '../utils/i18n.js';
+import { JobRequest, JobStatus } from '../types/index';
+import { Badge } from './Badge';
+import { useTranslation } from '../utils/i18n';
 
 interface JobCardProps {
   job: JobRequest;

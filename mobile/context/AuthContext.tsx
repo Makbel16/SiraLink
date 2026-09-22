@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { api, tokenStorage } from '../services/api.js';
-import { User, WorkerProfile, UserRole } from '../types/index.js';
+import { api, tokenStorage } from '../services/api';
+import { User, WorkerProfile, UserRole } from '../types/index';
 
 interface AuthContextType {
   user: User | null;

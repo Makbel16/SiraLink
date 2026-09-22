@@ -1,8 +1,8 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Mic, MapPin, ShieldCheck } from 'lucide-react-native';
-import { Button } from '../components/Button.js';
-import { useTranslation } from '../utils/i18n.js';
+import { Button } from '../components/Button';
+import { useTranslation } from '../utils/i18n';
 
 export default function OnboardingScreen() {
   const router = useRouter();

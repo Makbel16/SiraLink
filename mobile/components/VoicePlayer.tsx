@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
-import { Audio } from 'expo-av';
+import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import { Play, Pause, Volume2 } from 'lucide-react-native';
 
 interface VoicePlayerProps {
@@ -9,73 +8,40 @@ interface VoicePlayerProps {
 }
 
 export function VoicePlayer({ audioUrl, title = 'የድምጽ መልዕክት' }: VoicePlayerProps) {
-  const [sound, setSound] = useState<Audio.Sound | null>(null);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [positionMillis, setPositionMillis] = useState<number>(0);
-  const [durationMillis, setDurationMillis] = useState<number>(0);
+  const player = useAudioPlayer(audioUrl ? { uri: audioUrl } : null);
+  const status = useAudioPlayerStatus(player);
 
-  useEffect(() => {
-    return () => {
-      if (sound) {
-        sound.unloadAsync().catch(() => {});
-      }
-    };
-  }, [sound]);
+  const isPlaying = !!status?.playing;
+  const isLoading = !status?.isLoaded && !!audioUrl;
+  const currentTimeSec = status?.currentTime || 0;
+  const durationSec = status?.duration || 10;
 
-  const loadAndPlayAudio = async () => {
+  const togglePlay = () => {
     try {
-      if (sound) {
-        if (isPlaying) {
-          await sound.pauseAsync();
-          setIsPlaying(false);
-        } else {
-          await sound.playAsync();
-          setIsPlaying(true);
-        }
-        return;
+      if (isPlaying) {
+        player.pause();
+      } else {
+        player.play();
       }
-
-      setIsLoading(true);
-      const { sound: newSound } = await Audio.Sound.createAsync(
-        { uri: audioUrl },
-        { shouldPlay: true },
-        (status) => {
-          if (status.isLoaded) {
-            setPositionMillis(status.positionMillis || 0);
-            setDurationMillis(status.durationMillis || 0);
-            setIsPlaying(status.isPlaying);
-            if (status.didJustFinish) {
-              setIsPlaying(false);
-              setPositionMillis(0);
-            }
-          }
-        }
-      );
-
-      setSound(newSound);
-      setIsPlaying(true);
-      setIsLoading(false);
     } catch {
-      setIsLoading(false);
-      setIsPlaying(false);
+      // Ignored
     }
   };
 
-  const formatTime = (millis: number) => {
-    const totalSecs = Math.floor(millis / 1000);
+  const formatTime = (seconds: number) => {
+    const totalSecs = Math.floor(seconds);
     const m = Math.floor(totalSecs / 60);
     const s = totalSecs % 60;
     return `${m}:${s.toString().padStart(2, '0')}`;
   };
 
-  const progressPercent = durationMillis > 0 ? (positionMillis / durationMillis) * 100 : 0;
+  const progressPercent = durationSec > 0 ? Math.min(100, (currentTimeSec / durationSec) * 100) : 0;
 
   return (
     <View style={styles.container}>
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={loadAndPlayAudio}
+        onPress={togglePlay}
         disabled={isLoading}
         style={styles.playButton}
       >
@@ -95,7 +61,7 @@ export function VoicePlayer({ audioUrl, title = 'የድምጽ መልዕክት' }
             <Text style={styles.titleText}>{title}</Text>
           </View>
           <Text style={styles.timeText}>
-            {formatTime(positionMillis)} / {formatTime(durationMillis || 10000)}
+            {formatTime(currentTimeSec)} / {formatTime(durationSec)}
           </Text>
         </View>
 

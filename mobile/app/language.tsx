@@ -1,9 +1,9 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Check } from 'lucide-react-native';
-import { useTranslation } from '../utils/i18n.js';
-import { Button } from '../components/Button.js';
-import { SupportedLanguage } from '../types/index.js';
+import { useTranslation } from '../utils/i18n';
+import { Button } from '../components/Button';
+import { SupportedLanguage } from '../types/index';
 
 export default function LanguageScreen() {
   const router = useRouter();

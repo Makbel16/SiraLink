@@ -1,10 +1,10 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Star, MapPin, Wrench, Zap, Hammer, Paintbrush, Sparkles, Car, Construction, Truck, Flower2, CircleDot } from 'lucide-react-native';
-import { NearbyWorker, JobCategory } from '../types/index.js';
-import { Avatar } from './Avatar.js';
-import { Badge } from './Badge.js';
-import { Button } from './Button.js';
-import { useTranslation } from '../utils/i18n.js';
+import { NearbyWorker, JobCategory } from '../types/index';
+import { Avatar } from './Avatar';
+import { Badge } from './Badge';
+import { Button } from './Button';
+import { useTranslation } from '../utils/i18n';
 
 interface WorkerCardProps {
   worker: NearbyWorker;

@@ -9,7 +9,7 @@ import {
   JobCategory,
   JobStatus,
   TranscriptionResult
-} from '../types/index.js';
+} from '../types/index';
 
 const TOKEN_KEY = 'siralink_auth_token';
 

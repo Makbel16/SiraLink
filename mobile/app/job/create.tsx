@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert, SafeAreaView } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Wrench, MapPin, DollarSign, Send, Check } from 'lucide-react-native';
-import { api } from '../../services/api.js';
-import { useLocation } from '../../context/LocationContext.js';
-import { useTranslation } from '../../utils/i18n.js';
-import { Button } from '../../components/Button.js';
-import { VoicePlayer } from '../../components/VoicePlayer.js';
-import { JobCategory } from '../../types/index.js';
+import { api } from '../../services/api';
+import { useLocation } from '../../context/LocationContext';
+import { useTranslation } from '../../utils/i18n';
+import { Button } from '../../components/Button';
+import { VoicePlayer } from '../../components/VoicePlayer';
+import { JobCategory } from '../../types/index';
 
 export default function CreateJobScreen() {
   const router = useRouter();

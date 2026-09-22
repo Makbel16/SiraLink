@@ -3,12 +3,12 @@ import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView, SafeAreaV
 import { useRouter } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Briefcase, UserCheck, ArrowRight, DollarSign, Bell, MapPin, User, ChevronRight } from 'lucide-react-native';
-import { api } from '../../services/api.js';
-import { useAuth } from '../../context/AuthContext.js';
-import { useTranslation } from '../../utils/i18n.js';
-import { Button } from '../../components/Button.js';
-import { JobCard } from '../../components/JobCard.js';
-import { LoadingState } from '../../components/LoadingState.js';
+import { api } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
+import { useTranslation } from '../../utils/i18n';
+import { Button } from '../../components/Button';
+import { JobCard } from '../../components/JobCard';
+import { LoadingState } from '../../components/LoadingState';
 
 export default function WorkerDashboardScreen() {
   const router = useRouter();

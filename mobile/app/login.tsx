@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Phone, Shield, User, Briefcase } from 'lucide-react-native';
-import { Button } from '../components/Button.js';
-import { useAuth } from '../context/AuthContext.js';
-import { useTranslation } from '../utils/i18n.js';
-import { UserRole } from '../types/index.js';
+import { Button } from '../components/Button';
+import { useAuth } from '../context/AuthContext';
+import { useTranslation } from '../utils/i18n';
+import { UserRole } from '../types/index';
 
 export default function LoginScreen() {
   const router = useRouter();

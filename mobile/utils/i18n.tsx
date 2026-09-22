@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import amLocale from '../locales/am.json';
 import omLocale from '../locales/om.json';
 import enLocale from '../locales/en.json';
-import { SupportedLanguage } from '../types/index.js';
+import { SupportedLanguage } from '../types/index';
 
 type TranslationKey = keyof typeof enLocale;
 

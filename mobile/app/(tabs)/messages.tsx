@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, FlatList, SafeAreaView, TouchableOpacity } from 'react-native';
 import { Bell, CheckCircle2, AlertCircle, Clock } from 'lucide-react-native';
-import { useTranslation } from '../../utils/i18n.js';
-import { EmptyState } from '../../components/EmptyState.js';
+import { useTranslation } from '../../utils/i18n';
+import { EmptyState } from '../../components/EmptyState';
 
 interface NotificationItem {
   id: string;

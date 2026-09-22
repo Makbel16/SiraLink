@@ -2,14 +2,14 @@ import { View, Text, StyleSheet, FlatList, SafeAreaView, TouchableOpacity, Alert
 import { useRouter } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Check, X, Play, MapPin, Phone } from 'lucide-react-native';
-import { api } from '../../services/api.js';
-import { useTranslation } from '../../utils/i18n.js';
-import { Button } from '../../components/Button.js';
-import { VoicePlayer } from '../../components/VoicePlayer.js';
-import { Badge } from '../../components/Badge.js';
-import { EmptyState } from '../../components/EmptyState.js';
-import { LoadingState } from '../../components/LoadingState.js';
-import { JobRequest, JobStatus } from '../../types/index.js';
+import { api } from '../../services/api';
+import { useTranslation } from '../../utils/i18n';
+import { Button } from '../../components/Button';
+import { VoicePlayer } from '../../components/VoicePlayer';
+import { Badge } from '../../components/Badge';
+import { EmptyState } from '../../components/EmptyState';
+import { LoadingState } from '../../components/LoadingState';
+import { JobRequest, JobStatus } from '../../types/index';
 
 export default function WorkerJobsScreen() {
   const router = useRouter();

@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ShieldCheck, User } from 'lucide-react-native';
-import { Button } from '../components/Button.js';
-import { useAuth } from '../context/AuthContext.js';
-import { useTranslation } from '../utils/i18n.js';
+import { Button } from '../components/Button';
+import { useAuth } from '../context/AuthContext';
+import { useTranslation } from '../utils/i18n';
 
 export default function VerifyOtpScreen() {
   const router = useRouter();

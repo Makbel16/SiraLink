@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { MapPin, Navigation, List, Map as MapIcon, User, Star } from 'lucide-react-native';
-import { NearbyWorker } from '../types/index.js';
-import { useTranslation } from '../utils/i18n.js';
-import { WorkerCard } from './WorkerCard.js';
+import { NearbyWorker } from '../types/index';
+import { useTranslation } from '../utils/i18n';
+import { WorkerCard } from './WorkerCard';
 
 interface MapViewProps {
   userLocation: { latitude: number; longitude: number; district?: string };

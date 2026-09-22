@@ -9,11 +9,16 @@ import {
   Platform,
   Alert
 } from 'react-native';
-import { Audio } from 'expo-av';
+import {
+  useAudioRecorder,
+  RecordingPresets,
+  requestRecordingPermissionsAsync,
+  setAudioModeAsync
+} from 'expo-audio';
 import { Mic, Square, RotateCcw, Edit3 } from 'lucide-react-native';
-import { api } from '../services/api.js';
-import { TranscriptionResult } from '../types/index.js';
-import { useTranslation } from '../utils/i18n.js';
+import { api } from '../services/api';
+import { TranscriptionResult } from '../types/index';
+import { useTranslation } from '../utils/i18n';
 
 interface VoiceRecorderProps {
   onTranscriptionComplete: (result: TranscriptionResult) => void;
@@ -25,7 +30,7 @@ export function VoiceRecorder({
   onManualInputRequested
 }: VoiceRecorderProps) {
   const { t } = useTranslation();
-  const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [durationSecs, setDurationSecs] = useState<number>(0);
@@ -37,11 +42,11 @@ export function VoiceRecorder({
   useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
-      if (recording) {
-        recording.stopAndUnloadAsync().catch(() => {});
+      if (recorder.isRecording) {
+        recorder.stop().catch(() => {});
       }
     };
-  }, [recording]);
+  }, []);
 
   useEffect(() => {
     if (isRecording) {
@@ -68,25 +73,21 @@ export function VoiceRecorder({
     setErrorMsg(null);
     try {
       if (Platform.OS !== 'web') {
-        const { status } = await Audio.requestPermissionsAsync();
+        const { status } = await requestRecordingPermissionsAsync();
         if (status !== 'granted') {
           Alert.alert(t('microphone_permission'), t('microphone_permission'));
           return;
         }
 
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: true,
-          playsInSilentModeIOS: true
+        await setAudioModeAsync({
+          allowsRecording: true,
+          playsInSilentMode: true
         });
       }
 
-      const newRecording = new Audio.Recording();
-      await newRecording.prepareToRecordAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY
-      );
-      await newRecording.startAsync();
+      await recorder.prepareToRecordAsync();
+      recorder.record();
 
-      setRecording(newRecording);
       setIsRecording(true);
       setDurationSecs(0);
 
@@ -94,13 +95,13 @@ export function VoiceRecorder({
         setDurationSecs((prev) => prev + 1);
       }, 1000);
     } catch (err: any) {
-      setErrorMsg(err.message || 'Failed to start recording');
+      setErrorMsg(err?.message || 'Failed to start recording');
       setIsRecording(false);
     }
   };
 
   const stopAndUploadRecording = async () => {
-    if (!recording) return;
+    if (!isRecording && !recorder.isRecording) return;
 
     if (timerRef.current) {
       clearInterval(timerRef.current);
@@ -111,8 +112,8 @@ export function VoiceRecorder({
     setIsProcessing(true);
 
     try {
-      await recording.stopAndUnloadAsync();
-      const uri = recording.getURI();
+      await recorder.stop();
+      const uri = recorder.uri;
 
       if (!uri) {
         throw new Error('Recording audio URI unavailable');
@@ -120,13 +121,11 @@ export function VoiceRecorder({
 
       // Upload audio to backend speech-to-text pipeline
       const result = await api.uploadAndTranscribe(uri, 'user_voice_request.m4a', 'audio/m4a');
-      setRecording(null);
       setIsProcessing(false);
       onTranscriptionComplete(result);
     } catch (err: any) {
-      setErrorMsg(err.message || 'Voice processing failed. Please retry or enter text.');
+      setErrorMsg(err?.message || 'Voice processing failed. Please retry or enter text.');
       setIsProcessing(false);
-      setRecording(null);
     }
   };
 
@@ -135,10 +134,9 @@ export function VoiceRecorder({
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
-    if (recording) {
-      await recording.stopAndUnloadAsync().catch(() => {});
-      setRecording(null);
-    }
+    try {
+      await recorder.stop();
+    } catch {}
     setIsRecording(false);
     setDurationSecs(0);
   };
@@ -251,45 +249,45 @@ export function VoiceRecorder({
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    justifyContent: 'center',
     paddingVertical: 20
   },
   micWrapper: {
-    width: 120,
-    height: 120,
+    width: 140,
+    height: 140,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative'
   },
   pulseRing: {
     position: 'absolute',
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: 'rgba(239, 68, 68, 0.28)'
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: 'rgba(15, 118, 110, 0.25)'
   },
   micButton: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    backgroundColor: '#0F766E', // Primary Teal
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: '#0F766E',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#0F766E',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.35,
     shadowRadius: 16,
-    elevation: 8
+    elevation: 10
   },
   micButtonActive: {
-    backgroundColor: '#EF4444', // Alert Red during recording
+    backgroundColor: '#EF4444',
     shadowColor: '#EF4444'
   },
   micButtonProcessing: {
-    backgroundColor: '#0284C7' // Sky Blue during transcription
+    backgroundColor: '#D97706',
+    shadowColor: '#D97706'
   },
   statusBox: {
-    marginTop: 18,
+    marginTop: 16,
     alignItems: 'center'
   },
   activeRecordingRow: {
@@ -304,24 +302,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#EF4444'
   },
   timerText: {
-    fontSize: 20,
-    fontWeight: '800',
+    fontSize: 18,
+    fontWeight: '700',
     color: '#0F172A'
   },
   hintText: {
-    fontSize: 15,
-    color: '#64748B',
-    fontWeight: '500'
-  },
-  idleHint: {
-    fontSize: 16,
-    color: '#475569',
+    fontSize: 14,
+    color: '#0F766E',
     fontWeight: '600'
   },
   processingText: {
-    fontSize: 16,
-    color: '#0284C7',
-    fontWeight: '700'
+    fontSize: 15,
+    color: '#D97706',
+    fontWeight: '600'
+  },
+  idleHint: {
+    fontSize: 15,
+    color: '#64748B',
+    fontWeight: '500'
   },
   cancelRow: {
     marginTop: 14
@@ -330,73 +328,71 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    paddingVertical: 8,
     paddingHorizontal: 16,
+    paddingVertical: 8,
     borderRadius: 20,
     backgroundColor: '#F1F5F9'
   },
   cancelText: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#64748B',
     fontWeight: '600'
   },
   errorBox: {
-    marginTop: 16,
-    backgroundColor: '#FEE2E2',
+    marginTop: 14,
     padding: 12,
-    borderRadius: 14,
+    backgroundColor: '#FEF2F2',
+    borderRadius: 12,
     alignItems: 'center',
+    gap: 8,
     maxWidth: 320
   },
   errorText: {
     fontSize: 13,
     color: '#B91C1C',
-    textAlign: 'center',
-    marginBottom: 8
+    textAlign: 'center'
   },
   fallbackActions: {
     flexDirection: 'row',
-    gap: 12
+    gap: 12,
+    alignItems: 'center'
   },
   retryBtn: {
-    paddingVertical: 6,
     paddingHorizontal: 12,
-    backgroundColor: '#DC2626',
+    paddingVertical: 6,
+    backgroundColor: '#EF4444',
     borderRadius: 8
   },
   retryText: {
+    fontSize: 12,
     color: '#FFFFFF',
-    fontSize: 13,
-    fontWeight: '700'
+    fontWeight: '600'
   },
   manualBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingVertical: 6,
+    gap: 4,
     paddingHorizontal: 12,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#0F766E'
+    paddingVertical: 6,
+    backgroundColor: '#CCFBF1',
+    borderRadius: 8
   },
   manualText: {
+    fontSize: 12,
     color: '#0F766E',
-    fontSize: 13,
-    fontWeight: '700'
+    fontWeight: '600'
   },
   manualLinkButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    marginTop: 14,
+    marginTop: 12,
     paddingVertical: 8,
-    paddingHorizontal: 14
+    paddingHorizontal: 16
   },
   manualLinkText: {
     fontSize: 14,
-    color: '#64748B',
-    fontWeight: '600',
-    textDecorationLine: 'underline'
+    color: '#0F766E',
+    fontWeight: '600'
   }
 });

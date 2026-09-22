@@ -2,14 +2,14 @@ import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, Ale
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Phone, CheckCircle, Navigation, MapPin, Check, X } from 'lucide-react-native';
-import { api } from '../../../services/api.js';
-import { useTranslation } from '../../../utils/i18n.js';
-import { Button } from '../../../components/Button.js';
-import { Badge } from '../../../components/Badge.js';
-import { VoicePlayer } from '../../../components/VoicePlayer.js';
-import { LoadingState } from '../../../components/LoadingState.js';
-import { ErrorState } from '../../../components/ErrorState.js';
-import { JobStatus } from '../../../types/index.js';
+import { api } from '../../../services/api';
+import { useTranslation } from '../../../utils/i18n';
+import { Button } from '../../../components/Button';
+import { Badge } from '../../../components/Badge';
+import { VoicePlayer } from '../../../components/VoicePlayer';
+import { LoadingState } from '../../../components/LoadingState';
+import { ErrorState } from '../../../components/ErrorState';
+import { JobStatus } from '../../../types/index';
 
 export default function WorkerJobDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();

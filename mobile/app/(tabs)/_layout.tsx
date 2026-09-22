@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import { Home, Briefcase, Bell, User } from 'lucide-react-native';
-import { useTranslation } from '../../utils/i18n.js';
+import { useTranslation } from '../../utils/i18n';
 
 export default function TabLayout() {
   const { t } = useTranslation();

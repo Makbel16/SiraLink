@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert, SafeAreaView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useAuth } from '../../context/AuthContext.js';
-import { api } from '../../services/api.js';
-import { useTranslation } from '../../utils/i18n.js';
-import { Button } from '../../components/Button.js';
-import { VoiceRecorder } from '../../components/VoiceRecorder.js';
-import { JobCategory, TranscriptionResult } from '../../types/index.js';
+import { useAuth } from '../../context/AuthContext';
+import { api } from '../../services/api';
+import { useTranslation } from '../../utils/i18n';
+import { Button } from '../../components/Button';
+import { VoiceRecorder } from '../../components/VoiceRecorder';
+import { JobCategory, TranscriptionResult } from '../../types/index';
 
 export default function WorkerProfileEditScreen() {
   const router = useRouter();

@@ -1,8 +1,8 @@
 import { Stack } from 'expo-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { I18nProvider } from '../utils/i18n.js';
-import { AuthProvider } from '../context/AuthContext.js';
-import { LocationProvider } from '../context/LocationContext.js';
+import { I18nProvider } from '../utils/i18n';
+import { AuthProvider } from '../context/AuthContext';
+import { LocationProvider } from '../context/LocationContext';
 import { StatusBar } from 'expo-status-bar';
 
 const queryClient = new QueryClient({

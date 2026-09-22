@@ -3,12 +3,12 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, Refre
 import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { Briefcase } from 'lucide-react-native';
-import { api } from '../../services/api.js';
-import { useTranslation } from '../../utils/i18n.js';
-import { JobCard } from '../../components/JobCard.js';
-import { LoadingState } from '../../components/LoadingState.js';
-import { EmptyState } from '../../components/EmptyState.js';
-import { JobRequest, JobStatus } from '../../types/index.js';
+import { api } from '../../services/api';
+import { useTranslation } from '../../utils/i18n';
+import { JobCard } from '../../components/JobCard';
+import { LoadingState } from '../../components/LoadingState';
+import { EmptyState } from '../../components/EmptyState';
+import { JobRequest, JobStatus } from '../../types/index';
 
 export default function JobsTabScreen() {
   const router = useRouter();
