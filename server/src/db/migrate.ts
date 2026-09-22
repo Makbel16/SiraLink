@@ -9,7 +9,13 @@ const __dirname = path.dirname(__filename);
 
 export async function runMigrations() {
   logger.info('Starting database migrations...');
-  const migrationsDir = path.join(__dirname, 'migrations');
+  let migrationsDir = path.join(__dirname, 'migrations');
+  if (!fs.existsSync(migrationsDir)) {
+    migrationsDir = path.join(__dirname, '../../src/db/migrations');
+  }
+  if (!fs.existsSync(migrationsDir)) {
+    migrationsDir = path.resolve('src/db/migrations');
+  }
 
   const files = fs.readdirSync(migrationsDir).filter(f => f.endsWith('.sql')).sort();
   if (files.length === 0) {

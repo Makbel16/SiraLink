@@ -62,7 +62,7 @@ export class WhisperSpeechToTextService implements SpeechToTextService {
 }
 
 export class MockSpeechToTextService implements SpeechToTextService {
-  async transcribe(audioBuffer: Buffer, filename: string, mimetype: string): Promise<TranscriptionResult> {
+  async transcribe(audioBuffer: Buffer, filename: string, _mimetype: string): Promise<TranscriptionResult> {
     logger.info('Using Mock Speech-to-Text Provider (Dev mode)', { filename, size: audioBuffer.length });
 
     // Simulate realistic Amharic plumbing request for local development

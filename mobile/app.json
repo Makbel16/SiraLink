@@ -1,0 +1,57 @@
+{
+  "expo": {
+    "name": "SiraLink",
+    "slug": "siralink",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0F172A"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.siralink.app",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "SiraLink needs microphone access so you can speak your service request in Amharic, Afaan Oromoo, or English.",
+        "NSLocationWhenInUseUsageDescription": "SiraLink needs your location to find verified workers close to your home."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0F172A"
+      },
+      "package": "com.siralink.app",
+      "permissions": [
+        "RECORD_AUDIO",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "INTERNET"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow SiraLink to use your location to connect with nearby plumbers, electricians, and local workers."
+        }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Allow SiraLink to record your voice to describe the work you need done."
+        }
+      ]
+    ],
+    "scheme": "siralink"
+  }
+}

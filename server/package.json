@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "SiraLink (ስራLink) Backend API - Voice-first location-based marketplace for Ethiopia",
   "main": "dist/server.js",
+  "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",

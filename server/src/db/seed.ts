@@ -1,4 +1,4 @@
-import { pool, query } from './index.js';
+import { query } from './index.js';
 import { logger } from '../utils/logger.js';
 
 export async function seedDatabase() {
