@@ -74,7 +74,7 @@ export default function MessagesTabScreen() {
             </View>
           </TouchableOpacity>
         )}
-        ListEmptyEmpty={
+        ListEmptyComponent={
           <EmptyState
             icon={<Bell size={36} color="#94A3B8" />}
             title="ምንም አዲስ መልዕክት የለም"

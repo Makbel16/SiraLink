@@ -50,7 +50,8 @@
         {
           "microphonePermission": "Allow SiraLink to record your voice to describe the work you need done."
         }
-      ]
+      ],
+      "expo-asset"
     ],
     "scheme": "siralink"
   }

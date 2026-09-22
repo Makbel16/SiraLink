@@ -84,7 +84,7 @@ export default function JobsTabScreen() {
           renderItem={({ item }) => <JobCard job={item} onPress={handleJobPress} />}
           contentContainerStyle={styles.listContent}
           refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
-          ListEmptyEmpty={
+          ListEmptyComponent={
             <EmptyState
               icon={<Briefcase size={36} color="#94A3B8" />}
               title="ምንም የተመዘገበ ስራ የለም"

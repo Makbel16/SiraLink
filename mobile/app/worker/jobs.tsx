@@ -137,7 +137,7 @@ export default function WorkerJobsScreen() {
           renderItem={renderJobItem}
           contentContainerStyle={styles.listContent}
           refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
-          ListEmptyEmpty={
+          ListEmptyComponent={
             <EmptyState
               title="ምንም የተመዘገበ ስራ የለም"
               description="አዲስ የስራ ጥሪ ሲደርስዎ እዚህ ይታያል"

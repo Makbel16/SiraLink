@@ -59,9 +59,9 @@ export function JobCard({ job, onPress, isWorkerPerspective = false }: JobCardPr
         {job.title || `${job.category} Service`}
       </Text>
 
-      {job.textDescription ? (
+      {job.text_description ? (
         <Text style={styles.descriptionText} numberOfLines={2}>
-          {job.textDescription}
+          {job.text_description}
         </Text>
       ) : null}
 
