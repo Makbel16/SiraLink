@@ -1,6 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Platform } from 'react-native';
 import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-audio';
 import { Play, Pause, Volume2 } from 'lucide-react-native';
+import { api } from '../services/api';
 
 interface VoicePlayerProps {
   audioUrl: string;
@@ -8,11 +9,12 @@ interface VoicePlayerProps {
 }
 
 export function VoicePlayer({ audioUrl, title = 'የድምጽ መልዕክት' }: VoicePlayerProps) {
-  const player = useAudioPlayer(audioUrl ? { uri: audioUrl } : null);
+  const resolvedUrl = api.resolveMediaUrl(audioUrl);
+  const player = useAudioPlayer(resolvedUrl ? { uri: resolvedUrl } : null);
   const status = useAudioPlayerStatus(player);
 
   const isPlaying = !!status?.playing;
-  const isLoading = !status?.isLoaded && !!audioUrl;
+  const isLoading = !status?.isLoaded && !!resolvedUrl && !status?.currentTime;
   const currentTimeSec = status?.currentTime || 0;
   const durationSec = status?.duration || 10;
 
@@ -24,13 +26,14 @@ export function VoicePlayer({ audioUrl, title = 'የድምጽ መልዕክት' }
         if (Platform.OS !== 'web') {
           await setAudioModeAsync({
             allowsRecording: false,
-            playsInSilentMode: true
+            playsInSilentMode: true,
+            shouldPlayInBackground: false
           });
         }
         player.play();
       }
-    } catch {
-      // Ignored
+    } catch (err) {
+      console.warn('Voice playback failed:', err);
     }
   };
 

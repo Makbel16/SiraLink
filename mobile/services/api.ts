@@ -32,7 +32,19 @@ const getBaseUrl = (): string => {
   if (Platform.OS === 'android') {
     return 'http://10.0.2.2:3000';
   }
-  return 'http://localhost:3000';
+// Helper to resolve media URLs to the active development or production host
+export const resolveMediaUrl = (url?: string | null): string => {
+  if (!url) return '';
+  if (url.startsWith('file://') || url.startsWith('content://')) return url;
+  const baseUrl = getBaseUrl();
+  const idx = url.indexOf('/uploads/');
+  if (idx !== -1) {
+    return `${baseUrl}${url.substring(idx)}`;
+  }
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  return `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
 };
 
 const BASE_URL = getBaseUrl();
@@ -227,7 +239,7 @@ export const api = {
           reader.readAsDataURL(blob);
         });
 
-        return await request<TranscriptionResult>('/api/voice/transcribe', {
+        const res = await request<TranscriptionResult>('/api/voice/transcribe', {
           method: 'POST',
           body: JSON.stringify({
             audioBase64: base64Audio,
@@ -235,6 +247,10 @@ export const api = {
             mimetype
           })
         });
+        if (res && res.audioUrl) {
+          res.audioUrl = resolveMediaUrl(res.audioUrl);
+        }
+        return res;
       } catch (webErr) {
         console.warn('Web base64 transcription error:', webErr);
       }
@@ -250,7 +266,7 @@ export const api = {
         encoding: FileSystem.EncodingType.Base64
       });
 
-      return await request<TranscriptionResult>('/api/voice/transcribe', {
+      const res = await request<TranscriptionResult>('/api/voice/transcribe', {
         method: 'POST',
         body: JSON.stringify({
           audioBase64: base64Audio,
@@ -258,6 +274,10 @@ export const api = {
           mimetype
         })
       });
+      if (res && res.audioUrl) {
+        res.audioUrl = resolveMediaUrl(res.audioUrl);
+      }
+      return res;
     } catch (fsErr) {
       console.warn('Base64 read error, trying native FileSystem.uploadAsync', fsErr);
 
@@ -279,7 +299,11 @@ export const api = {
       if (uploadResult.status >= 200 && uploadResult.status < 300) {
         const json = JSON.parse(uploadResult.body);
         if (json.success && json.data) {
-          return json.data as TranscriptionResult;
+          const data = json.data as TranscriptionResult;
+          if (data && data.audioUrl) {
+            data.audioUrl = resolveMediaUrl(data.audioUrl);
+          }
+          return data;
         }
       }
       throw new Error(`Upload failed with status ${uploadResult.status}`);
@@ -343,5 +367,9 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ token, platform: Platform.OS })
     });
-  }
+  },
+
+  // Helpers
+  resolveMediaUrl,
+  getBaseUrl
 };
