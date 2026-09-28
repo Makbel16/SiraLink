@@ -357,48 +357,116 @@ class InMemoryDatabase {
     // 12. INSERT INTO job_requests
     if (/INSERT\s+INTO\s+job_requests/i.test(q)) {
       const jobId = randomUUID();
+      const clientId = params[0];
+      const workerId = params[1] || null;
+      const category = params[2];
+      const title = params[3] || `${category} Service`;
+      const audioUrl = params[4] || null;
+      const textDesc = params[5] || null;
+      const status = params[6] || (workerId ? 'ASSIGNED' : 'OPEN');
+      const price = params[7] ? parseFloat(params[7]) : 400;
+      const lng = params[8] ? parseFloat(params[8]) : 38.74;
+      const lat = params[9] ? parseFloat(params[9]) : 9.02;
+
       const job: MockJob = {
         id: jobId,
-        client_id: params[0],
-        category: params[1],
-        title: params[2] || 'Service Request',
-        description: params[3] || '',
-        audio_url: params[4] || null,
-        transcription_text: params[5] || null,
-        offered_price_etb: params[6] || 400,
-        status: 'OPEN',
-        latitude: params[7] || 9.02,
-        longitude: params[8] || 38.74,
-        worker_id: params[9] || null,
-        accepted_at: null,
+        client_id: clientId,
+        worker_id: workerId,
+        category,
+        title,
+        description: textDesc || '',
+        audio_url: audioUrl,
+        transcription_text: textDesc,
+        offered_price_etb: price,
+        status,
+        latitude: lat,
+        longitude: lng,
+        accepted_at: workerId ? new Date() : null,
         completed_at: null,
         created_at: new Date(),
         updated_at: new Date()
       };
       this.jobs.set(jobId, job);
-      return { rows: [job], rowCount: 1 };
+      return {
+        rows: [
+          {
+            ...job,
+            offered_price_etb: price,
+            latitude: lat,
+            longitude: lng
+          }
+        ],
+        rowCount: 1
+      };
     }
 
-    // 13. SELECT FROM job_requests
-    if (/SELECT\s+.*FROM\s+job_requests/i.test(q)) {
-      const searchId = params[0];
-      if (/WHERE\s+id\s*=\s*\$1/i.test(q)) {
-        const j = this.jobs.get(searchId);
-        return { rows: j ? [j] : [], rowCount: j ? 1 : 0 };
+    // 13. SELECT FROM job_requests (with client & worker details)
+    if (/FROM\s+job_requests/i.test(q)) {
+      const populateJob = (j: MockJob) => {
+        const client = this.users.get(j.client_id);
+        const worker = j.worker_id ? this.users.get(j.worker_id) : null;
+        return {
+          id: j.id,
+          client_id: j.client_id,
+          worker_id: j.worker_id,
+          category: j.category,
+          title: j.title,
+          audio_description_url: j.audio_url,
+          text_description: j.description,
+          status: j.status,
+          offered_price_etb: j.offered_price_etb,
+          latitude: j.latitude,
+          longitude: j.longitude,
+          created_at: j.created_at,
+          updated_at: j.updated_at,
+          client_name: client?.full_name || 'Client',
+          client_phone: client?.phone_number || '',
+          worker_name: worker?.full_name || null,
+          worker_phone: worker?.phone_number || null
+        };
+      };
+
+      // By specific job ID (jr.id = $1 or id = $1)
+      if (/jr\.id\s*=\s*\$1|WHERE\s+id\s*=\s*\$1/i.test(q)) {
+        const j = this.jobs.get(params[0]);
+        return { rows: j ? [populateJob(j)] : [], rowCount: j ? 1 : 0 };
       }
-      const list = Array.from(this.jobs.values());
+
+      // By client_id (jr.client_id = $1)
+      if (/jr\.client_id\s*=\s*\$1/i.test(q)) {
+        const clientId = params[0];
+        const list = Array.from(this.jobs.values())
+          .filter((j) => j.client_id === clientId)
+          .sort((a, b) => b.created_at.getTime() - a.created_at.getTime())
+          .map(populateJob);
+        return { rows: list, rowCount: list.length };
+      }
+
+      // By worker_id (jr.worker_id = $1)
+      if (/jr\.worker_id\s*=\s*\$1/i.test(q)) {
+        const workerId = params[0];
+        const list = Array.from(this.jobs.values())
+          .filter((j) => j.worker_id === workerId)
+          .sort((a, b) => b.created_at.getTime() - a.created_at.getTime())
+          .map(populateJob);
+        return { rows: list, rowCount: list.length };
+      }
+
+      const list = Array.from(this.jobs.values()).map(populateJob);
       return { rows: list, rowCount: list.length };
     }
 
     // 14. UPDATE job_requests SET status
-    if (/UPDATE\s+job_requests\s+SET\s+status/i.test(q)) {
+    if (/UPDATE\s+job_requests\s+SET/i.test(q)) {
       const newStatus = params[0];
-      const jobId = params[1];
+      const jobId = params[params.length - 1];
       const j = this.jobs.get(jobId);
       if (j) {
         j.status = newStatus;
+        if (params.length > 2 && params[1]) j.worker_id = params[1];
         if (newStatus === 'ASSIGNED') j.accepted_at = new Date();
         if (newStatus === 'COMPLETED') j.completed_at = new Date();
+        j.updated_at = new Date();
         return { rows: [j], rowCount: 1 };
       }
       return { rows: [], rowCount: 0 };

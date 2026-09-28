@@ -7,18 +7,31 @@ import { logger } from '../utils/logger.js';
 export class VoiceController {
   async transcribeAudio(request: FastifyRequest, reply: FastifyReply) {
     try {
-      if (!request.isMultipart()) {
-        return reply.status(400).send(errorResponse('FILE_REQUIRED', 'Multipart audio file is required'));
+      let buffer: Buffer;
+      let filename = 'voice-record.m4a';
+      let mimetype = 'audio/m4a';
+
+      if (request.isMultipart()) {
+        const data = await request.file();
+        if (!data) {
+          return reply.status(400).send(errorResponse('FILE_REQUIRED', 'Audio file is required'));
+        }
+        buffer = await data.toBuffer();
+        filename = data.filename || filename;
+        mimetype = data.mimetype || mimetype;
+      } else {
+        const body = request.body as any;
+        if (!body || !body.audioBase64) {
+          return reply.status(400).send(errorResponse('FILE_REQUIRED', 'Audio file or base64 audio is required'));
+        }
+        buffer = Buffer.from(body.audioBase64, 'base64');
+        filename = body.filename || filename;
+        mimetype = body.mimetype || mimetype;
       }
 
-      const data = await request.file();
-      if (!data) {
-        return reply.status(400).send(errorResponse('FILE_REQUIRED', 'Audio file is required'));
+      if (buffer.length === 0) {
+        return reply.status(400).send(errorResponse('FILE_EMPTY', 'Uploaded audio file is empty'));
       }
-
-      const buffer = await data.toBuffer();
-      const filename = data.filename || 'voice-record.m4a';
-      const mimetype = data.mimetype || 'audio/m4a';
 
       logger.info('Processing uploaded voice file', {
         filename,

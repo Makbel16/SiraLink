@@ -20,7 +20,8 @@ import { logger } from './utils/logger.js';
 
 export async function buildApp(): Promise<FastifyInstance> {
   const app = fastify({
-    logger: false // Using structured custom logger
+    logger: false, // Using structured custom logger
+    bodyLimit: 30 * 1024 * 1024
   });
 
   // Security Headers

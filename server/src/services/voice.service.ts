@@ -117,7 +117,7 @@ export class VoiceService {
     filename: string,
     mimetype: string
   ): Promise<TranscriptionResult> {
-    // Validate file format
+    // Validate file format - support all common mobile audio containers & mimetypes
     const validMimes = [
       'audio/m4a',
       'audio/x-m4a',
@@ -128,12 +128,25 @@ export class VoiceService {
       'audio/mpeg',
       'audio/mp3',
       'audio/webm',
-      'audio/ogg'
+      'audio/ogg',
+      'audio/3gpp',
+      'audio/3gp',
+      'audio/amr',
+      'audio/caf',
+      'audio/x-caf',
+      'video/mp4',
+      'video/3gpp',
+      'application/octet-stream'
     ];
 
-    const isExtensionValid = /\.(m4a|mp4|aac|wav|mp3|webm|ogg)$/i.test(filename);
-    if (!validMimes.includes(mimetype.toLowerCase()) && !isExtensionValid) {
-      throw new Error(`Unsupported audio format: ${mimetype}. Please upload m4a, wav, or mp3.`);
+    const isExtensionValid = /\.(m4a|mp4|aac|wav|mp3|webm|ogg|3gp|3gpp|amr|caf)$/i.test(filename);
+    let effectiveMime = mimetype.toLowerCase();
+    let effectiveFilename = filename;
+
+    if (!validMimes.includes(effectiveMime) && !isExtensionValid) {
+      // In mobile environments, default to audio/m4a rather than rejecting user audio
+      effectiveMime = 'audio/m4a';
+      effectiveFilename = `${filename}.m4a`;
     }
 
     // Limit audio size to 25MB
@@ -142,7 +155,7 @@ export class VoiceService {
       throw new Error('Audio file exceeds maximum allowed limit of 25MB');
     }
 
-    return this.sttProvider.transcribe(audioBuffer, filename, mimetype);
+    return this.sttProvider.transcribe(audioBuffer, effectiveFilename, effectiveMime);
   }
 
   /**

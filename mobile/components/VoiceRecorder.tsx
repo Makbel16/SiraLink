@@ -113,6 +113,12 @@ export function VoiceRecorder({
 
     try {
       await recorder.stop();
+      if (Platform.OS !== 'web') {
+        await setAudioModeAsync({
+          allowsRecording: false,
+          playsInSilentMode: true
+        });
+      }
       const uri = recorder.uri;
 
       if (!uri) {
@@ -136,6 +142,12 @@ export function VoiceRecorder({
     }
     try {
       await recorder.stop();
+      if (Platform.OS !== 'web') {
+        await setAudioModeAsync({
+          allowsRecording: false,
+          playsInSilentMode: true
+        });
+      }
     } catch {}
     setIsRecording(false);
     setDurationSecs(0);

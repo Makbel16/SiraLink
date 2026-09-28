@@ -1,5 +1,5 @@
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
-import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Platform } from 'react-native';
+import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-audio';
 import { Play, Pause, Volume2 } from 'lucide-react-native';
 
 interface VoicePlayerProps {
@@ -16,11 +16,17 @@ export function VoicePlayer({ audioUrl, title = 'የድምጽ መልዕክት' }
   const currentTimeSec = status?.currentTime || 0;
   const durationSec = status?.duration || 10;
 
-  const togglePlay = () => {
+  const togglePlay = async () => {
     try {
       if (isPlaying) {
         player.pause();
       } else {
+        if (Platform.OS !== 'web') {
+          await setAudioModeAsync({
+            allowsRecording: false,
+            playsInSilentMode: true
+          });
+        }
         player.play();
       }
     } catch {

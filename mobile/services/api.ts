@@ -1,6 +1,8 @@
 import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
+import * as FileSystem from 'expo-file-system/legacy';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
 import {
   User,
   WorkerProfile,
@@ -18,7 +20,15 @@ const getBaseUrl = (): string => {
   if (process.env.EXPO_PUBLIC_API_URL) {
     return process.env.EXPO_PUBLIC_API_URL.replace(/\/$/, '');
   }
-  // Android emulator uses 10.0.2.2 to access host machine localhost
+  // Auto-detect development server host from Expo Constants (works with both local Wi-Fi and Tunnel)
+  const hostUri = Constants.expoConfig?.hostUri;
+  if (hostUri) {
+    if (hostUri.includes('.exp.direct')) {
+      return `https://${hostUri}`;
+    }
+    return `http://${hostUri}`;
+  }
+  // Android emulator fallback
   if (Platform.OS === 'android') {
     return 'http://10.0.2.2:3000';
   }
@@ -74,7 +84,13 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  if (!(options.body instanceof FormData)) {
+  const isFormData =
+    options.body instanceof FormData ||
+    (options.body && typeof options.body === 'object' && '_parts' in (options.body as any));
+
+  if (isFormData) {
+    delete headers['Content-Type'];
+  } else if (options.body && !headers['Content-Type']) {
     headers['Content-Type'] = 'application/json';
   }
 
@@ -190,24 +206,84 @@ export const api = {
   },
 
   // Voice
-  async uploadAndTranscribe(fileUri: string, filename = 'voice.m4a', mimetype = 'audio/m4a'): Promise<TranscriptionResult> {
-    const formData = new FormData();
+  async uploadAndTranscribe(
+    fileUri: string,
+    filename = 'voice.m4a',
+    mimetype = 'audio/m4a'
+  ): Promise<TranscriptionResult> {
+    // 1. Web environment: read blob as base64 and POST standard JSON
     if (Platform.OS === 'web') {
-      const res = await fetch(fileUri);
-      const blob = await res.blob();
-      formData.append('file', blob, filename);
-    } else {
-      formData.append('file', {
-        uri: fileUri,
-        name: filename,
-        type: mimetype
-      } as any);
+      try {
+        const res = await fetch(fileUri);
+        const blob = await res.blob();
+        const base64Audio = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const result = (reader.result as string) || '';
+            const base64 = result.includes(',') ? result.split(',')[1] : result;
+            resolve(base64 || '');
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+
+        return await request<TranscriptionResult>('/api/voice/transcribe', {
+          method: 'POST',
+          body: JSON.stringify({
+            audioBase64: base64Audio,
+            filename,
+            mimetype
+          })
+        });
+      } catch (webErr) {
+        console.warn('Web base64 transcription error:', webErr);
+      }
     }
 
-    return request('/api/voice/transcribe', {
-      method: 'POST',
-      body: formData
-    });
+    // 2. Native Mobile (Android & iOS):
+    // In React Native 0.86, appending a plain JS object { uri, name, type } to FormData causes:
+    // [Error: Unsupported FormDataPart implementation].
+    // Strategy A: Read audio file directly as base64 string and POST as standard JSON.
+    // This completely eliminates FormDataPart and multipart boundary issues.
+    try {
+      const base64Audio = await FileSystem.readAsStringAsync(fileUri, {
+        encoding: FileSystem.EncodingType.Base64
+      });
+
+      return await request<TranscriptionResult>('/api/voice/transcribe', {
+        method: 'POST',
+        body: JSON.stringify({
+          audioBase64: base64Audio,
+          filename,
+          mimetype
+        })
+      });
+    } catch (fsErr) {
+      console.warn('Base64 read error, trying native FileSystem.uploadAsync', fsErr);
+
+      // Strategy B: Native FileSystem.uploadAsync (streaming native multipart without JS FormData)
+      const token = await tokenStorage.get();
+      const url = `${BASE_URL}/api/voice/transcribe`;
+
+      const uploadResult = await FileSystem.uploadAsync(url, fileUri, {
+        fieldName: 'file',
+        httpMethod: 'POST',
+        uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+        mimeType: mimetype,
+        headers: {
+          Accept: 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        }
+      });
+
+      if (uploadResult.status >= 200 && uploadResult.status < 300) {
+        const json = JSON.parse(uploadResult.body);
+        if (json.success && json.data) {
+          return json.data as TranscriptionResult;
+        }
+      }
+      throw new Error(`Upload failed with status ${uploadResult.status}`);
+    }
   },
 
   // Jobs
