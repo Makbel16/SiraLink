@@ -19,6 +19,7 @@ import { Mic, Square, RotateCcw, Edit3 } from 'lucide-react-native';
 import { api } from '../services/api';
 import { TranscriptionResult } from '../types/index';
 import { useTranslation } from '../utils/i18n';
+import { useTheme } from '../context/ThemeContext';
 
 interface VoiceRecorderProps {
   onTranscriptionComplete: (result: TranscriptionResult) => void;
@@ -30,6 +31,7 @@ export function VoiceRecorder({
   onManualInputRequested
 }: VoiceRecorderProps) {
   const { t } = useTranslation();
+  const { colors, isDark } = useTheme();
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
@@ -42,9 +44,11 @@ export function VoiceRecorder({
   useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
-      if (recorder.isRecording) {
-        recorder.stop().catch(() => {});
-      }
+      try {
+        if (recorder && typeof recorder.stop === 'function') {
+          recorder.stop().catch(() => {});
+        }
+      } catch {}
     };
   }, []);
 
@@ -211,38 +215,44 @@ export function VoiceRecorder({
         {isRecording ? (
           <View style={styles.activeRecordingRow}>
             <View style={styles.recordingDot} />
-            <Text style={styles.timerText}>{formatTime(durationSecs)}</Text>
-            <Text style={styles.hintText}>{t('listening')}</Text>
+            <Text style={[styles.timerText, { color: colors.textPrimary }]}>{formatTime(durationSecs)}</Text>
+            <Text style={[styles.hintText, { color: colors.primary }]}>{t('listening')}</Text>
           </View>
         ) : isProcessing ? (
-          <Text style={styles.processingText}>{t('transcribing')}</Text>
+          <Text style={[styles.processingText, { color: colors.primary }]}>{t('transcribing')}</Text>
         ) : (
-          <Text style={styles.idleHint}>{t('tap_and_speak')}</Text>
+          <Text style={[styles.idleHint, { color: colors.textSecondary }]}>{t('tap_and_speak')}</Text>
         )}
       </View>
 
       {/* Action Controls when Recording */}
       {isRecording && (
         <View style={styles.cancelRow}>
-          <TouchableOpacity onPress={cancelRecording} style={styles.cancelButton}>
-            <RotateCcw size={18} color="#64748B" />
-            <Text style={styles.cancelText}>{t('cancel')}</Text>
+          <TouchableOpacity
+            onPress={cancelRecording}
+            style={[
+              styles.cancelButton,
+              { backgroundColor: isDark ? colors.surfaceSubtle : '#F1F5F9' }
+            ]}
+          >
+            <RotateCcw size={16} color={colors.textSecondary} />
+            <Text style={[styles.cancelText, { color: colors.textSecondary }]}>{t('cancel')}</Text>
           </TouchableOpacity>
         </View>
       )}
 
       {/* Error Message & Manual Text Fallback */}
       {errorMsg && (
-        <View style={styles.errorBox}>
-          <Text style={styles.errorText}>{errorMsg}</Text>
+        <View style={[styles.errorBox, { backgroundColor: isDark ? colors.dangerLight : '#FEF2F2' }]}>
+          <Text style={[styles.errorText, { color: colors.danger }]}>{errorMsg}</Text>
           <View style={styles.fallbackActions}>
             <TouchableOpacity onPress={startRecording} style={styles.retryBtn}>
               <Text style={styles.retryText}>{t('retry')}</Text>
             </TouchableOpacity>
             {onManualInputRequested && (
               <TouchableOpacity onPress={onManualInputRequested} style={styles.manualBtn}>
-                <Edit3 size={15} color="#0F766E" />
-                <Text style={styles.manualText}>{t('enter_manually')}</Text>
+                <Edit3 size={15} color={colors.primary} />
+                <Text style={[styles.manualText, { color: colors.primary }]}>{t('enter_manually')}</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -253,11 +263,19 @@ export function VoiceRecorder({
       {!isRecording && !isProcessing && onManualInputRequested && (
         <TouchableOpacity
           onPress={onManualInputRequested}
-          style={styles.manualLinkButton}
+          style={[
+            styles.manualLinkButton,
+            {
+              backgroundColor: isDark ? colors.surfaceSubtle : '#F1F5F9',
+              borderColor: colors.borderSubtle
+            }
+          ]}
           activeOpacity={0.7}
         >
-          <Edit3 size={16} color="#64748B" />
-          <Text style={styles.manualLinkText}>{t('enter_manually')}</Text>
+          <Edit3 size={15} color={colors.textSecondary} />
+          <Text style={[styles.manualLinkText, { color: colors.textSecondary }]}>
+            {t('enter_manually')}
+          </Text>
         </TouchableOpacity>
       )}
     </View>
