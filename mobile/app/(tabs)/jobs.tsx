@@ -18,7 +18,6 @@ import {
   CheckCircle2,
   ListFilter,
   Plus,
-  Sparkles,
   Zap,
   Award,
   ChevronRight,
@@ -134,19 +133,6 @@ function StatusCard3D({ item, count, isSelected, onPress }: StatusCard3DProps) {
                 {item.tag}
               </Text>
             </View>
-
-            {isSelected ? (
-              <View
-                style={[
-                  styles.activeCheckPill,
-                  { backgroundColor: item.accentColor }
-                ]}
-              >
-                <Sparkles size={11} color="#FFFFFF" />
-              </View>
-            ) : (
-              <View style={styles.inactiveIndicator} />
-            )}
           </View>
 
           {/* 3D Floating Emoji Bubble */}
@@ -867,24 +853,6 @@ const styles = StyleSheet.create({
   cardTagText: {
     fontSize: 10,
     fontWeight: '800'
-  },
-  activeCheckPill: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 3
-  },
-  inactiveIndicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)'
   },
   iconCenterWrapper: {
     alignItems: 'center',

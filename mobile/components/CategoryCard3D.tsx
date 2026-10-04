@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Sparkles, Users, ArrowUpRight } from 'lucide-react-native';
+import { Users, ArrowUpRight } from 'lucide-react-native';
 import { JobCategory } from '../types/index';
 import { useTheme } from '../context/ThemeContext';
 
@@ -72,7 +72,7 @@ export function CategoryCard3D({ item, isSelected, onPress }: CategoryCard3DProp
           end={{ x: 1, y: 1 }}
           style={styles.gradientSurface}
         >
-          {/* Top Tag or Selection Status */}
+          {/* Top Tag */}
           <View style={styles.topRow}>
             {item.tag ? (
               <View
@@ -94,20 +94,7 @@ export function CategoryCard3D({ item, isSelected, onPress }: CategoryCard3DProp
                   {item.tag}
                 </Text>
               </View>
-            ) : (
-              <View style={{ flex: 1 }} />
-            )}
-
-            {isSelected && (
-              <View
-                style={[
-                  styles.selectedCheck,
-                  { backgroundColor: colors.primary }
-                ]}
-              >
-                <Sparkles size={11} color="#FFFFFF" />
-              </View>
-            )}
+            ) : null}
           </View>
 
           {/* 3D Floating Emoji Icon Container */}
@@ -232,18 +219,6 @@ const styles = StyleSheet.create({
   tagText: {
     fontSize: 10,
     fontWeight: '800'
-  },
-  selectedCheck: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#0D9488',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 3
   },
   iconContainer: {
     alignItems: 'center',
