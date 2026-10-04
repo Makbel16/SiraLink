@@ -32,6 +32,9 @@ const getBaseUrl = (): string => {
   if (Platform.OS === 'android') {
     return 'http://10.0.2.2:3000';
   }
+  return 'http://localhost:3000';
+};
+
 // Helper to resolve media URLs to the active development or production host
 export const resolveMediaUrl = (url?: string | null): string => {
   if (!url) return '';
@@ -226,8 +229,8 @@ export const api = {
     // 1. Web environment: read blob as base64 and POST standard JSON
     if (Platform.OS === 'web') {
       try {
-        const res = await fetch(fileUri);
-        const blob = await res.blob();
+        const blobRes = await fetch(fileUri);
+        const blob = await blobRes.blob();
         const base64Audio = await new Promise<string>((resolve, reject) => {
           const reader = new FileReader();
           reader.onloadend = () => {

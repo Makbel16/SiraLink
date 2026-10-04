@@ -1,14 +1,89 @@
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Alert, ScrollView } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  SafeAreaView,
+  Alert,
+  ScrollView,
+  Animated,
+  Platform,
+  Switch
+} from 'react-native';
 import { useRouter } from 'expo-router';
-import { Globe, Briefcase, Settings as SettingsIcon, LogOut, ChevronRight, Phone, ShieldCheck } from 'lucide-react-native';
+import {
+  Globe,
+  Briefcase,
+  Settings as SettingsIcon,
+  LogOut,
+  ChevronRight,
+  Phone,
+  ShieldCheck,
+  Moon,
+  Sun,
+  Star,
+  Sparkles,
+  CircleHelp,
+  Bell,
+  Check,
+  Copy,
+  Zap,
+  Award
+} from 'lucide-react-native';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from '../../utils/i18n';
+import { useTheme } from '../../context/ThemeContext';
 import { Avatar } from '../../components/Avatar';
 
 export default function ProfileTabScreen() {
   const router = useRouter();
   const { user, logout, setRoleMode } = useAuth();
-  const { t, language } = useTranslation();
+  const { t, language, setLanguage } = useTranslation();
+  const { theme, isDark, toggleTheme, colors } = useTheme();
+
+  const [copiedPhone, setCopiedPhone] = useState(false);
+
+  // Entrance Animations
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(24)).current;
+
+  // Toggle Switch Animation
+  const switchTranslate = useRef(new Animated.Value(isDark ? 28 : 0)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        tension: 50,
+        friction: 8,
+        useNativeDriver: true
+      })
+    ]).start();
+  }, []);
+
+  useEffect(() => {
+    Animated.spring(switchTranslate, {
+      toValue: isDark ? 28 : 0,
+      tension: 65,
+      friction: 7,
+      useNativeDriver: true
+    }).start();
+  }, [isDark]);
+
+  const handleToggleTheme = () => {
+    toggleTheme();
+  };
+
+  const handleCopyPhone = () => {
+    setCopiedPhone(true);
+    setTimeout(() => setCopiedPhone(false), 2000);
+  };
 
   const handleLogout = () => {
     Alert.alert('ውጣ (Log Out)', 'እርግጠኛ ነዎት ከስራLink መውጣት ይፈልጋሉ?', [
@@ -29,6 +104,17 @@ export default function ProfileTabScreen() {
     router.push('/worker');
   };
 
+  const handleHelpSupport = () => {
+    Alert.alert(
+      'የደንበኞች ድጋፍ (Help & Support)',
+      'የስራLink ድጋፍ ማዕከልን ማግኘት ይፈልጋሉ?\nስልክ: 8199 ወይም +251 911 000 000',
+      [
+        { text: 'ዝጋ (Close)', style: 'cancel' },
+        { text: 'ይደውሉ (Call)', onPress: () => {} }
+      ]
+    );
+  };
+
   const getLangName = (code: string) => {
     if (code === 'am') return 'አማርኛ';
     if (code === 'om') return 'Afaan Oromoo';
@@ -36,88 +122,479 @@ export default function ProfileTabScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Profile Card */}
-        <View style={styles.profileCard}>
-          <Avatar
-            name={user?.full_name}
-            imageUrl={user?.avatar_url}
-            size={72}
-            isVerified={user?.is_verified}
-          />
-
-          <View style={styles.profileDetails}>
-            <Text style={styles.nameText}>{user?.full_name || 'የስራLink ተጠቃሚ'}</Text>
-            <View style={styles.phoneRow}>
-              <Phone size={14} color="#64748B" />
-              <Text style={styles.phoneText}>{user?.phone_number || '+251 9...'}</Text>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <Animated.View
+          style={{
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }]
+          }}
+        >
+          {/* Header Title Bar */}
+          <View style={styles.topBar}>
+            <View>
+              <Text style={[styles.topTitle, { color: colors.textPrimary }]}>
+                {t('profile')}
+              </Text>
+              <Text style={[styles.topSubtitle, { color: colors.textSecondary }]}>
+                የመለያዎ እና የአገልግሎት ቅንብሮች
+              </Text>
             </View>
 
-            <View style={styles.roleBadge}>
-              <Text style={styles.roleBadgeText}>
-                {user?.role === 'WORKER' ? t('worker') : t('client')}
+            {/* Quick Status Pill */}
+            <View
+              style={[
+                styles.trustBadge,
+                {
+                  backgroundColor: isDark ? 'rgba(20, 184, 166, 0.15)' : '#F0FDFA',
+                  borderColor: isDark ? 'rgba(20, 184, 166, 0.3)' : '#CCFBF1'
+                }
+              ]}
+            >
+              <ShieldCheck size={14} color={colors.primary} />
+              <Text style={[styles.trustBadgeText, { color: colors.primary }]}>
+                {user?.is_verified ? 'የተረጋገጠ (Verified)' : 'ተጠቃሚ (Member)'}
               </Text>
             </View>
           </View>
-        </View>
 
-        {/* Action Menu */}
-        <View style={styles.menuSection}>
-          <TouchableOpacity
-            style={styles.menuItem}
-            activeOpacity={0.7}
-            onPress={handleSwitchToWorker}
+          {/* Hero Profile Card */}
+          <View
+            style={[
+              styles.profileHeroCard,
+              {
+                backgroundColor: colors.surfaceCard,
+                borderColor: colors.border
+              },
+              colors.cardShadow
+            ]}
           >
-            <View style={[styles.menuIconCircle, { backgroundColor: '#F0FDFA' }]}>
-              <Briefcase size={20} color="#0F766E" />
+            {/* Glowing Accent Ring Background Effect */}
+            <View
+              style={[
+                styles.heroGlow,
+                {
+                  backgroundColor: isDark ? colors.primaryGlow : 'rgba(13, 148, 136, 0.05)'
+                }
+              ]}
+            />
+
+            <View style={styles.heroMainRow}>
+              <View style={styles.avatarWrapper}>
+                <Avatar
+                  name={user?.full_name}
+                  imageUrl={user?.avatar_url}
+                  size={76}
+                  isVerified={user?.is_verified}
+                />
+                <View
+                  style={[
+                    styles.onlineDot,
+                    {
+                      borderColor: colors.surfaceCard,
+                      backgroundColor: colors.success
+                    }
+                  ]}
+                />
+              </View>
+
+              <View style={styles.heroDetails}>
+                <View style={styles.nameRow}>
+                  <Text style={[styles.userNameText, { color: colors.textPrimary }]} numberOfLines={1}>
+                    {user?.full_name || 'የስራLink ተጠቃሚ'}
+                  </Text>
+                  <Sparkles size={16} color={colors.accent} />
+                </View>
+
+                {/* Phone Pill */}
+                <TouchableOpacity
+                  style={[
+                    styles.phonePill,
+                    {
+                      backgroundColor: isDark ? colors.surfaceSubtle : '#F8FAFC',
+                      borderColor: colors.borderSubtle
+                    }
+                  ]}
+                  activeOpacity={0.7}
+                  onPress={handleCopyPhone}
+                >
+                  <Phone size={13} color={colors.textSecondary} />
+                  <Text style={[styles.phonePillText, { color: colors.textSecondary }]}>
+                    {user?.phone_number || '+251 9...'}
+                  </Text>
+                  {copiedPhone ? (
+                    <Check size={12} color={colors.primary} />
+                  ) : (
+                    <Copy size={12} color={colors.textMuted} />
+                  )}
+                </TouchableOpacity>
+
+                {/* Role Pill */}
+                <View style={styles.roleContainer}>
+                  <View
+                    style={[
+                      styles.roleBadge,
+                      {
+                        backgroundColor:
+                          user?.role === 'WORKER'
+                            ? isDark
+                              ? 'rgba(245, 158, 11, 0.18)'
+                              : '#FEF3C7'
+                            : isDark
+                            ? 'rgba(20, 184, 166, 0.18)'
+                            : '#CCFBF1'
+                      }
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.roleBadgeText,
+                        {
+                          color: user?.role === 'WORKER' ? colors.accent : colors.primary
+                        }
+                      ]}
+                    >
+                      {user?.role === 'WORKER' ? `⚡ ${t('worker')}` : `👤 ${t('client')}`}
+                    </Text>
+                  </View>
+                </View>
+              </View>
             </View>
-            <View style={styles.menuTextContent}>
-              <Text style={styles.menuItemTitle}>{t('worker_mode')}</Text>
-              <Text style={styles.menuItemSub}>ወደ ባለሙያ ገጽ ይቀይሩ ወይም ስራ ይቀበሉ</Text>
+
+            {/* Quick Stats Bar */}
+            <View
+              style={[
+                styles.statsRow,
+                {
+                  backgroundColor: isDark ? 'rgba(11, 15, 25, 0.65)' : '#F8FAFC',
+                  borderColor: colors.borderSubtle
+                }
+              ]}
+            >
+              <View style={styles.statItem}>
+                <View style={styles.statIconRow}>
+                  <Briefcase size={14} color={colors.primary} />
+                  <Text style={[styles.statValue, { color: colors.textPrimary }]}>
+                    {user?.role === 'WORKER' ? '34' : '8'}
+                  </Text>
+                </View>
+                <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
+                  {user?.role === 'WORKER' ? 'የተሰሩ ስራዎች' : 'የተጠየቁ ስራዎች'}
+                </Text>
+              </View>
+
+              <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
+
+              <View style={styles.statItem}>
+                <View style={styles.statIconRow}>
+                  <Star size={14} color="#F59E0B" fill="#F59E0B" />
+                  <Text style={[styles.statValue, { color: colors.textPrimary }]}>4.9</Text>
+                </View>
+                <Text style={[styles.statLabel, { color: colors.textSecondary }]}>አጠቃላይ ደረጃ</Text>
+              </View>
+
+              <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
+
+              <View style={styles.statItem}>
+                <View style={styles.statIconRow}>
+                  <Award size={14} color={colors.primary} />
+                  <Text style={[styles.statValue, { color: colors.textPrimary }]}>100%</Text>
+                </View>
+                <Text style={[styles.statLabel, { color: colors.textSecondary }]}>የስራ እርካታ</Text>
+              </View>
             </View>
-            <ChevronRight size={18} color="#94A3B8" />
+          </View>
+
+          {/* Section: Night Mode Hero Feature Card */}
+          <View style={styles.sectionContainer}>
+            <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>
+              ገጽታ እና እይታ (APPEARANCE)
+            </Text>
+
+            <TouchableOpacity
+              style={[
+                styles.nightModeCard,
+                {
+                  backgroundColor: colors.surfaceCard,
+                  borderColor: isDark ? colors.primary : colors.border
+                },
+                colors.cardShadow
+              ]}
+              activeOpacity={0.85}
+              onPress={handleToggleTheme}
+            >
+              <View style={styles.nightModeLeft}>
+                <View
+                  style={[
+                    styles.nightModeIconCircle,
+                    {
+                      backgroundColor: isDark
+                        ? 'rgba(245, 158, 11, 0.15)'
+                        : 'rgba(13, 148, 136, 0.12)'
+                    }
+                  ]}
+                >
+                  {isDark ? (
+                    <Moon size={22} color={colors.accent} fill={colors.accent} />
+                  ) : (
+                    <Sun size={22} color={colors.primary} />
+                  )}
+                </View>
+                <View style={styles.nightModeTextWrapper}>
+                  <View style={styles.nightModeTitleRow}>
+                    <Text style={[styles.nightModeTitle, { color: colors.textPrimary }]}>
+                      {isDark ? 'የሌሊት ገጽታ (Night Mode)' : 'የቀን ገጽታ (Day Mode)'}
+                    </Text>
+                    {isDark && (
+                      <View style={styles.activePill}>
+                        <Text style={styles.activePillText}>በርቷል (ON)</Text>
+                      </View>
+                    )}
+                  </View>
+                  <Text style={[styles.nightModeSubtitle, { color: colors.textSecondary }]}>
+                    {isDark
+                      ? 'የጨለመ ገጽታ ለአይን ምቹ እና ባትሪ ቆጣቢ ነው'
+                      : 'ወደ ሌሊት ገጽታ ለመቀየር እዚህ ይጫኑ'}
+                  </Text>
+                </View>
+              </View>
+
+              {/* Custom Animated Toggle Switch Button */}
+              <View
+                style={[
+                  styles.toggleTrack,
+                  {
+                    backgroundColor: isDark ? colors.primary : '#E2E8F0',
+                    borderColor: isDark ? colors.primaryLight : '#CBD5E1'
+                  }
+                ]}
+              >
+                <Animated.View
+                  style={[
+                    styles.toggleThumb,
+                    {
+                      backgroundColor: '#FFFFFF',
+                      transform: [{ translateX: switchTranslate }]
+                    }
+                  ]}
+                >
+                  {isDark ? (
+                    <Moon size={12} color="#0F172A" fill="#0F172A" />
+                  ) : (
+                    <Sun size={12} color="#F59E0B" />
+                  )}
+                </Animated.View>
+              </View>
+            </TouchableOpacity>
+          </View>
+
+          {/* Section: Worker Mode Switcher Banner */}
+          <View style={styles.sectionContainer}>
+            <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>
+              የስራ ሁነታ (SERVICES & WORK)
+            </Text>
+
+            <TouchableOpacity
+              style={[
+                styles.workerBannerCard,
+                {
+                  backgroundColor: isDark ? '#142834' : '#F0FDFA',
+                  borderColor: isDark ? 'rgba(20, 184, 166, 0.3)' : '#CCFBF1'
+                }
+              ]}
+              activeOpacity={0.85}
+              onPress={handleSwitchToWorker}
+            >
+              <View
+                style={[
+                  styles.workerIconBubble,
+                  { backgroundColor: isDark ? colors.primaryLight : '#0D9488' }
+                ]}
+              >
+                <Briefcase size={22} color="#FFFFFF" />
+              </View>
+
+              <View style={styles.workerTextContent}>
+                <View style={styles.workerBadgeRow}>
+                  <Text style={[styles.workerBannerTitle, { color: colors.textPrimary }]}>
+                    {t('worker_mode')}
+                  </Text>
+                  <View style={styles.earningBadge}>
+                    <Zap size={11} color="#FFFFFF" />
+                    <Text style={styles.earningBadgeText}>ገቢ ያግኙ</Text>
+                  </View>
+                </View>
+                <Text style={[styles.workerBannerSub, { color: colors.textSecondary }]}>
+                  የራስዎን ሙያ ያካፍሉ፣ በአቅራቢያዎ ያሉ ስራዎችን ይቀበሉ
+                </Text>
+              </View>
+
+              <View
+                style={[
+                  styles.chevronCircle,
+                  { backgroundColor: isDark ? colors.surfaceSubtle : '#FFFFFF' }
+                ]}
+              >
+                <ChevronRight size={18} color={colors.primary} />
+              </View>
+            </TouchableOpacity>
+          </View>
+
+          {/* Section: Preferences & Language Card */}
+          <View style={styles.sectionContainer}>
+            <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>
+              ቅንብሮች (PREFERENCES & SETTINGS)
+            </Text>
+
+            <View
+              style={[
+                styles.menuCardGroup,
+                {
+                  backgroundColor: colors.surfaceCard,
+                  borderColor: colors.border
+                },
+                colors.cardShadow
+              ]}
+            >
+              {/* Language Selection Row */}
+              <TouchableOpacity
+                style={[styles.menuRowItem, { borderBottomColor: colors.borderSubtle }]}
+                activeOpacity={0.7}
+                onPress={() => router.push('/language')}
+              >
+                <View
+                  style={[
+                    styles.menuRowIcon,
+                    {
+                      backgroundColor: isDark
+                        ? 'rgba(245, 158, 11, 0.15)'
+                        : '#FEF3C7'
+                    }
+                  ]}
+                >
+                  <Globe size={18} color="#D97706" />
+                </View>
+
+                <View style={styles.menuRowText}>
+                  <Text style={[styles.menuRowTitle, { color: colors.textPrimary }]}>
+                    {t('select_language')}
+                  </Text>
+                  <Text style={[styles.menuRowSubtitle, { color: colors.textSecondary }]}>
+                    ቋንቋ ይምረጡ (Amharic, English, Oromoo)
+                  </Text>
+                </View>
+
+                <View
+                  style={[
+                    styles.langActiveChip,
+                    {
+                      backgroundColor: isDark ? colors.surfaceSubtle : '#F1F5F9',
+                      borderColor: colors.border
+                    }
+                  ]}
+                >
+                  <Text style={[styles.langActiveText, { color: colors.primary }]}>
+                    {getLangName(language)}
+                  </Text>
+                  <ChevronRight size={14} color={colors.textMuted} />
+                </View>
+              </TouchableOpacity>
+
+              {/* Notification & Sounds Row */}
+              <TouchableOpacity
+                style={[styles.menuRowItem, { borderBottomColor: colors.borderSubtle }]}
+                activeOpacity={0.7}
+                onPress={() => router.push('/settings')}
+              >
+                <View
+                  style={[
+                    styles.menuRowIcon,
+                    {
+                      backgroundColor: isDark
+                        ? 'rgba(14, 165, 233, 0.15)'
+                        : '#E0F2FE'
+                    }
+                  ]}
+                >
+                  <Bell size={18} color="#0284C7" />
+                </View>
+
+                <View style={styles.menuRowText}>
+                  <Text style={[styles.menuRowTitle, { color: colors.textPrimary }]}>
+                    ማሳወቂያዎች (Notifications)
+                  </Text>
+                  <Text style={[styles.menuRowSubtitle, { color: colors.textSecondary }]}>
+                    የስራ ጥያቄ እና መልዕክት ድምጾች
+                  </Text>
+                </View>
+
+                <ChevronRight size={18} color={colors.textMuted} />
+              </TouchableOpacity>
+
+              {/* Help & Support Center */}
+              <TouchableOpacity
+                style={styles.menuRowItem}
+                activeOpacity={0.7}
+                onPress={handleHelpSupport}
+              >
+                <View
+                  style={[
+                    styles.menuRowIcon,
+                    {
+                      backgroundColor: isDark
+                        ? 'rgba(168, 85, 247, 0.15)'
+                        : '#F3E8FF'
+                    }
+                  ]}
+                >
+                  <CircleHelp size={18} color="#9333EA" />
+                </View>
+
+                <View style={styles.menuRowText}>
+                  <Text style={[styles.menuRowTitle, { color: colors.textPrimary }]}>
+                    እርዳታ እና ድጋፍ (Help & Support)
+                  </Text>
+                  <Text style={[styles.menuRowSubtitle, { color: colors.textSecondary }]}>
+                    የቀጥታ ስልክ መስመር 8199 ወይም ፈጣን ጥያቄዎች
+                  </Text>
+                </View>
+
+                <ChevronRight size={18} color={colors.textMuted} />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Section: Logout Action Button */}
+          <TouchableOpacity
+            style={[
+              styles.logoutButton,
+              {
+                backgroundColor: isDark ? 'rgba(239, 68, 68, 0.12)' : '#FEE2E2',
+                borderColor: isDark ? 'rgba(239, 68, 68, 0.25)' : '#FECACA'
+              }
+            ]}
+            activeOpacity={0.8}
+            onPress={handleLogout}
+          >
+            <LogOut size={19} color={colors.danger} />
+            <Text style={[styles.logoutText, { color: colors.danger }]}>
+              {t('logout')} (ውጣ)
+            </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.menuItem}
-            activeOpacity={0.7}
-            onPress={() => router.push('/language')}
-          >
-            <View style={[styles.menuIconCircle, { backgroundColor: '#FEF3C7' }]}>
-              <Globe size={20} color="#D97706" />
-            </View>
-            <View style={styles.menuTextContent}>
-              <Text style={styles.menuItemTitle}>{t('select_language')}</Text>
-              <Text style={styles.menuItemSub}>{getLangName(language)}</Text>
-            </View>
-            <ChevronRight size={18} color="#94A3B8" />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.menuItem}
-            activeOpacity={0.7}
-            onPress={() => router.push('/settings')}
-          >
-            <View style={[styles.menuIconCircle, { backgroundColor: '#E0F2FE' }]}>
-              <SettingsIcon size={20} color="#0284C7" />
-            </View>
-            <View style={styles.menuTextContent}>
-              <Text style={styles.menuItemTitle}>{t('settings')}</Text>
-              <Text style={styles.menuItemSub}>የመተግበሪያ እና የግንኙነት ሁኔታ</Text>
-            </View>
-            <ChevronRight size={18} color="#94A3B8" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Logout Button */}
-        <TouchableOpacity style={styles.logoutButton} activeOpacity={0.8} onPress={handleLogout}>
-          <LogOut size={18} color="#DC2626" />
-          <Text style={styles.logoutText}>{t('logout')}</Text>
-        </TouchableOpacity>
-
-        {/* Version info */}
-        <Text style={styles.versionText}>SiraLink v1.0.0 — Addis Ababa, Ethiopia</Text>
+          {/* Elegant Footer Details */}
+          <View style={styles.footerContainer}>
+            <Text style={[styles.brandFooterText, { color: colors.textMuted }]}>
+              ስራLink (SiraLink) • Addis Ababa, Ethiopia
+            </Text>
+            <Text style={[styles.versionFooterText, { color: colors.textMuted }]}>
+              Version 1.0.0 • Voice-First Marketplace
+            </Text>
+          </View>
+        </Animated.View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -125,114 +602,347 @@ export default function ProfileTabScreen() {
 
 const styles = StyleSheet.create({
   safeArea: {
-    flex: 1,
-    backgroundColor: '#F8FAFC'
+    flex: 1
   },
   scrollContent: {
-    padding: 20
+    paddingHorizontal: 18,
+    paddingTop: 14,
+    paddingBottom: 40
   },
-  profileCard: {
+  topBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 22,
-    padding: 20,
-    gap: 16,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2
+    justifyContent: 'space-between',
+    marginBottom: 18
   },
-  profileDetails: {
-    flex: 1,
-    gap: 4
-  },
-  nameText: {
-    fontSize: 18,
+  topTitle: {
+    fontSize: 24,
     fontWeight: '800',
-    color: '#0F172A'
+    letterSpacing: -0.3
   },
-  phoneRow: {
+  topSubtitle: {
+    fontSize: 13,
+    marginTop: 2,
+    fontWeight: '500'
+  },
+  trustBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 20,
+    borderWidth: 1
+  },
+  trustBadgeText: {
+    fontSize: 11,
+    fontWeight: '700'
+  },
+  profileHeroCard: {
+    borderRadius: 24,
+    padding: 20,
+    borderWidth: 1,
+    position: 'relative',
+    overflow: 'hidden'
+  },
+  heroGlow: {
+    position: 'absolute',
+    top: -50,
+    right: -50,
+    width: 140,
+    height: 140,
+    borderRadius: 70
+  },
+  heroMainRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16
+  },
+  avatarWrapper: {
+    position: 'relative'
+  },
+  onlineDot: {
+    position: 'absolute',
+    bottom: 2,
+    right: 2,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    borderWidth: 2
+  },
+  heroDetails: {
+    flex: 1,
+    gap: 6
+  },
+  nameRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6
   },
-  phoneText: {
-    fontSize: 14,
-    color: '#64748B',
+  userNameText: {
+    fontSize: 19,
+    fontWeight: '800',
+    letterSpacing: -0.2
+  },
+  phonePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
+    borderWidth: 1,
+    alignSelf: 'flex-start'
+  },
+  phonePillText: {
+    fontSize: 13,
     fontWeight: '600'
   },
+  roleContainer: {
+    flexDirection: 'row',
+    marginTop: 2
+  },
   roleBadge: {
-    backgroundColor: '#F0FDFA',
     paddingHorizontal: 10,
-    paddingVertical: 3,
-    borderRadius: 8,
-    alignSelf: 'flex-start',
-    marginTop: 4
+    paddingVertical: 4,
+    borderRadius: 8
   },
   roleBadgeText: {
     fontSize: 12,
-    fontWeight: '700',
-    color: '#0F766E'
+    fontWeight: '800'
   },
-  menuSection: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    marginTop: 20,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    overflow: 'hidden'
-  },
-  menuItem: {
+  statsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 18,
-    gap: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F8FAFC'
+    justifyContent: 'space-between',
+    marginTop: 18,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    borderWidth: 1
   },
-  menuIconCircle: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+  statItem: {
+    alignItems: 'center',
+    flex: 1
+  },
+  statIconRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5
+  },
+  statValue: {
+    fontSize: 15,
+    fontWeight: '800'
+  },
+  statLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    marginTop: 2
+  },
+  statDivider: {
+    width: 1,
+    height: 24
+  },
+  sectionContainer: {
+    marginTop: 22
+  },
+  sectionTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+    marginBottom: 8,
+    paddingLeft: 4
+  },
+  nightModeCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderRadius: 20,
+    borderWidth: 1
+  },
+  nightModeLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    flex: 1
+  },
+  nightModeIconCircle: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     alignItems: 'center',
     justifyContent: 'center'
   },
-  menuTextContent: {
+  nightModeTextWrapper: {
     flex: 1
   },
-  menuItemTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#0F172A',
-    marginBottom: 2
+  nightModeTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8
   },
-  menuItemSub: {
+  nightModeTitle: {
+    fontSize: 15,
+    fontWeight: '700'
+  },
+  activePill: {
+    backgroundColor: '#0D9488',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6
+  },
+  activePillText: {
+    fontSize: 10,
+    color: '#FFFFFF',
+    fontWeight: '800'
+  },
+  nightModeSubtitle: {
     fontSize: 12,
-    color: '#64748B'
+    marginTop: 2,
+    fontWeight: '500'
+  },
+  toggleTrack: {
+    width: 58,
+    height: 32,
+    borderRadius: 16,
+    padding: 3,
+    borderWidth: 1,
+    justifyContent: 'center'
+  },
+  toggleThumb: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3
+  },
+  workerBannerCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    gap: 14
+  },
+  workerIconBubble: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  workerTextContent: {
+    flex: 1
+  },
+  workerBadgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8
+  },
+  workerBannerTitle: {
+    fontSize: 16,
+    fontWeight: '800'
+  },
+  earningBadge: {
+    backgroundColor: '#0D9488',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 6
+  },
+  earningBadgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#FFFFFF'
+  },
+  workerBannerSub: {
+    fontSize: 12,
+    marginTop: 2,
+    fontWeight: '500'
+  },
+  chevronCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  menuCardGroup: {
+    borderRadius: 20,
+    borderWidth: 1,
+    overflow: 'hidden'
+  },
+  menuRowItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    gap: 14,
+    borderBottomWidth: 1
+  },
+  menuRowIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  menuRowText: {
+    flex: 1
+  },
+  menuRowTitle: {
+    fontSize: 15,
+    fontWeight: '700'
+  },
+  menuRowSubtitle: {
+    fontSize: 12,
+    marginTop: 2
+  },
+  langActiveChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 10,
+    borderWidth: 1
+  },
+  langActiveText: {
+    fontSize: 12,
+    fontWeight: '700'
   },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#FEE2E2',
     paddingVertical: 16,
-    borderRadius: 16,
-    marginTop: 24
+    borderRadius: 18,
+    marginTop: 26,
+    borderWidth: 1
   },
   logoutText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#DC2626'
+    fontSize: 15,
+    fontWeight: '800'
   },
-  versionText: {
-    marginTop: 24,
+  footerContainer: {
+    alignItems: 'center',
+    marginTop: 26,
+    gap: 4
+  },
+  brandFooterText: {
     fontSize: 12,
-    color: '#94A3B8',
-    textAlign: 'center'
+    fontWeight: '600'
+  },
+  versionFooterText: {
+    fontSize: 11,
+    fontWeight: '500'
   }
 });

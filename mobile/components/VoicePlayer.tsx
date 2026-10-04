@@ -10,25 +10,34 @@ interface VoicePlayerProps {
 
 export function VoicePlayer({ audioUrl, title = 'የድምጽ መልዕክት' }: VoicePlayerProps) {
   const resolvedUrl = api.resolveMediaUrl(audioUrl);
-  const player = useAudioPlayer(resolvedUrl ? { uri: resolvedUrl } : null);
+  const player = useAudioPlayer(resolvedUrl ? { uri: resolvedUrl } : null, {
+    downloadFirst: true,
+    updateInterval: 250
+  });
   const status = useAudioPlayerStatus(player);
 
   const isPlaying = !!status?.playing;
-  const isLoading = !status?.isLoaded && !!resolvedUrl && !status?.currentTime;
+  const isLoading = !!resolvedUrl && !status?.isLoaded && !status?.duration && !status?.error;
   const currentTimeSec = status?.currentTime || 0;
-  const durationSec = status?.duration || 10;
+  const durationSec = status?.duration || 0;
 
   const togglePlay = async () => {
     try {
+      if (Platform.OS !== 'web') {
+        await setAudioModeAsync({
+          allowsRecording: false,
+          playsInSilentMode: true,
+          shouldPlayInBackground: false,
+          shouldRouteThroughEarpiece: false,
+          interruptionMode: 'doNotMix'
+        });
+      }
+
       if (isPlaying) {
         player.pause();
       } else {
-        if (Platform.OS !== 'web') {
-          await setAudioModeAsync({
-            allowsRecording: false,
-            playsInSilentMode: true,
-            shouldPlayInBackground: false
-          });
+        if (status?.didJustFinish || (durationSec > 0 && currentTimeSec >= durationSec)) {
+          await player.seekTo(0);
         }
         player.play();
       }

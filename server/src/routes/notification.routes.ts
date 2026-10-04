@@ -19,7 +19,6 @@ export async function notificationRoutes(fastify: FastifyInstance) {
     if (!parse.success) {
       return reply.status(400).send(errorResponse('VALIDATION_ERROR', 'Valid device token is required'));
     }
-
     await notificationService.registerDeviceToken(
       request.user.userId,
       parse.data.token,

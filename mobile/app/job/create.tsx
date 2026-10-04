@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert, SafeAreaView } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { Wrench, MapPin, DollarSign, Send, Check } from 'lucide-react-native';
+import { Wrench, MapPin, DollarSign, Send, Check, Sparkles, Navigation } from 'lucide-react-native';
 import { api } from '../../services/api';
 import { useLocation } from '../../context/LocationContext';
 import { useTranslation } from '../../utils/i18n';
+import { useTheme } from '../../context/ThemeContext';
 import { Button } from '../../components/Button';
 import { VoicePlayer } from '../../components/VoicePlayer';
 import { JobCategory } from '../../types/index';
@@ -20,6 +21,7 @@ export default function CreateJobScreen() {
 
   const { currentLocation } = useLocation();
   const { t } = useTranslation();
+  const { colors, isDark } = useTheme();
 
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>(params.transcript || '');
@@ -73,29 +75,86 @@ export default function CreateJobScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+        {/* Header Greeting */}
+        <View style={styles.headerTitleBox}>
+          <Text style={[styles.mainTitle, { color: colors.textPrimary }]}>
+            የስራ ጥያቄዎን ያረጋግጡ
+          </Text>
+          <Text style={[styles.mainSubtitle, { color: colors.textSecondary }]}>
+            ዝርዝሩን ይሙሉ እና በአቅራቢያዎ ያሉ ባለሙያዎችን በፍጥነት ያግኙ
+          </Text>
+        </View>
+
         {/* Voice Audio Preview if recorded */}
         {params.audioUrl && (
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>{t('record_voice')}</Text>
-            <VoicePlayer audioUrl={params.audioUrl} title="የተቀረጸው የስራ ድምጽ" />
+          <View
+            style={[
+              styles.sectionCard,
+              {
+                backgroundColor: colors.surfaceCard,
+                borderColor: colors.border
+              },
+              colors.cardShadow
+            ]}
+          >
+            <View style={styles.sectionHeaderRow}>
+              <Sparkles size={16} color={colors.accent} />
+              <Text style={[styles.sectionCardTitle, { color: colors.textPrimary }]}>
+                የተቀረጸው የድምጽ መልዕክት (Voice Note)
+              </Text>
+            </View>
+            <VoicePlayer audioUrl={params.audioUrl} title="የስራ መጠይቅ ድምጽ" />
           </View>
         )}
 
         {/* Category Confirmation Pills */}
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>{t('category')}</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.catScroll}>
+        <View
+          style={[
+            styles.sectionCard,
+            {
+              backgroundColor: colors.surfaceCard,
+              borderColor: colors.border
+            },
+            colors.cardShadow
+          ]}
+        >
+          <Text style={[styles.sectionCardTitle, { color: colors.textPrimary }]}>
+            {t('category')} (የስራው ዘርፍ)
+          </Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.catScroll}
+          >
             {categories.map((cat) => {
               const isSelected = selectedCategory === cat;
               return (
                 <TouchableOpacity
                   key={cat}
                   onPress={() => setSelectedCategory(cat)}
-                  style={[styles.catPill, isSelected && styles.catPillActive]}
+                  style={[
+                    styles.catPill,
+                    {
+                      backgroundColor: isSelected
+                        ? colors.primary
+                        : isDark
+                        ? colors.surfaceSubtle
+                        : '#F1F5F9',
+                      borderColor: isSelected ? colors.primary : colors.border
+                    }
+                  ]}
                 >
-                  <Text style={[styles.catText, isSelected && styles.catTextActive]}>
+                  <Text
+                    style={[
+                      styles.catText,
+                      {
+                        color: isSelected ? '#FFFFFF' : colors.textSecondary,
+                        fontWeight: isSelected ? '800' : '600'
+                      }
+                    ]}
+                  >
                     {cat}
                   </Text>
                 </TouchableOpacity>
@@ -104,25 +163,54 @@ export default function CreateJobScreen() {
           </ScrollView>
         </View>
 
-        {/* Job Title Input */}
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>የስራ ርዕስ (Job Title)</Text>
+        {/* Job Details Card */}
+        <View
+          style={[
+            styles.sectionCard,
+            {
+              backgroundColor: colors.surfaceCard,
+              borderColor: colors.border
+            },
+            colors.cardShadow
+          ]}
+        >
+          <Text style={[styles.sectionCardTitle, { color: colors.textPrimary }]}>
+            የስራው ዝርዝር መረጃ (Job Details)
+          </Text>
+
+          {/* Job Title Input */}
+          <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>የስራ ርዕስ (Job Title)</Text>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              {
+                backgroundColor: isDark ? colors.surfaceSubtle : '#F8FAFC',
+                borderColor: colors.border,
+                color: colors.textPrimary
+              }
+            ]}
             placeholder="ለምሳሌ፡ የወጥ ቤት ቧንቧ ጥገና"
-            placeholderTextColor="#94A3B8"
+            placeholderTextColor={colors.textMuted}
             value={title}
             onChangeText={setTitle}
           />
-        </View>
 
-        {/* Text Description / Transcript */}
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>ዝርዝር መግለጫ (Description)</Text>
+          {/* Text Description / Transcript */}
+          <Text style={[styles.inputLabel, { color: colors.textSecondary, marginTop: 12 }]}>
+            ዝርዝር መግለጫ (Description)
+          </Text>
           <TextInput
-            style={[styles.input, styles.textArea]}
+            style={[
+              styles.input,
+              styles.textArea,
+              {
+                backgroundColor: isDark ? colors.surfaceSubtle : '#F8FAFC',
+                borderColor: colors.border,
+                color: colors.textPrimary
+              }
+            ]}
             placeholder="ችግሩን ወይም የሚፈልጉትን ስራ በዝርዝር ይጻፉ..."
-            placeholderTextColor="#94A3B8"
+            placeholderTextColor={colors.textMuted}
             multiline
             numberOfLines={4}
             value={description}
@@ -130,28 +218,94 @@ export default function CreateJobScreen() {
           />
         </View>
 
-        {/* Budget Input in ETB */}
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>የተገመተ ዋጋ በብር (Estimated Budget in ETB)</Text>
-          <View style={styles.budgetRow}>
-            <Text style={styles.currencyPrefix}>ETB</Text>
+        {/* Budget Input Card */}
+        <View
+          style={[
+            styles.sectionCard,
+            {
+              backgroundColor: colors.surfaceCard,
+              borderColor: colors.border
+            },
+            colors.cardShadow
+          ]}
+        >
+          <Text style={[styles.sectionCardTitle, { color: colors.textPrimary }]}>
+            የተገመተ ዋጋ (Estimated Budget)
+          </Text>
+
+          <View
+            style={[
+              styles.budgetRow,
+              {
+                backgroundColor: isDark ? colors.surfaceSubtle : '#F8FAFC',
+                borderColor: colors.border
+              }
+            ]}
+          >
+            <View
+              style={[
+                styles.currencyPill,
+                { backgroundColor: isDark ? 'rgba(20, 184, 166, 0.18)' : '#CCFBF1' }
+              ]}
+            >
+              <Text style={[styles.currencyPrefix, { color: colors.primary }]}>ETB (ብር)</Text>
+            </View>
             <TextInput
-              style={styles.budgetInput}
+              style={[styles.budgetInput, { color: colors.textPrimary }]}
               keyboardType="numeric"
               placeholder="500"
-              placeholderTextColor="#94A3B8"
+              placeholderTextColor={colors.textMuted}
               value={budget}
               onChangeText={setBudget}
             />
           </View>
+
+          {/* Quick Amount Suggestion Chips */}
+          <View style={styles.quickBudgetRow}>
+            {['300', '500', '800', '1200'].map((amt) => (
+              <TouchableOpacity
+                key={amt}
+                onPress={() => setBudget(amt)}
+                style={[
+                  styles.quickAmtPill,
+                  {
+                    backgroundColor: budget === amt ? colors.primary : isDark ? colors.surfaceSubtle : '#F1F5F9',
+                    borderColor: budget === amt ? colors.primary : colors.border
+                  }
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.quickAmtText,
+                    {
+                      color: budget === amt ? '#FFFFFF' : colors.textSecondary,
+                      fontWeight: budget === amt ? '800' : '600'
+                    }
+                  ]}
+                >
+                  {amt} ETB
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
 
-        {/* Location Info Banner */}
-        <View style={styles.locationBanner}>
-          <MapPin size={18} color="#0F766E" />
+        {/* Location Info Banner Card */}
+        <View
+          style={[
+            styles.locationBanner,
+            {
+              backgroundColor: isDark ? '#142834' : '#F0FDFA',
+              borderColor: isDark ? 'rgba(20, 184, 166, 0.3)' : '#CCFBF1'
+            }
+          ]}
+        >
+          <MapPin size={22} color={colors.primary} />
           <View style={{ flex: 1 }}>
-            <Text style={styles.locationBannerTitle}>የስራው ቦታ (Location)</Text>
-            <Text style={styles.locationBannerSub}>
+            <Text style={[styles.locationBannerTitle, { color: colors.textPrimary }]}>
+              የስራው ቦታ (Location)
+            </Text>
+            <Text style={[styles.locationBannerSub, { color: colors.textSecondary }]}>
               {currentLocation.district || 'Addis Ababa'} ({currentLocation.latitude.toFixed(4)}, {currentLocation.longitude.toFixed(4)})
             </Text>
           </View>
@@ -163,7 +317,7 @@ export default function CreateJobScreen() {
           onPress={handleSubmit}
           loading={submitting}
           size="lg"
-          style={{ marginTop: 24 }}
+          style={{ marginTop: 20 }}
           icon={<Send size={18} color="#FFFFFF" />}
         />
       </ScrollView>
@@ -173,104 +327,126 @@ export default function CreateJobScreen() {
 
 const styles = StyleSheet.create({
   safeArea: {
-    flex: 1,
-    backgroundColor: '#F8FAFC'
+    flex: 1
   },
   container: {
-    padding: 20,
+    padding: 18,
     paddingBottom: 40
   },
-  section: {
-    marginBottom: 18
+  headerTitleBox: {
+    marginBottom: 16
   },
-  sectionLabel: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#334155',
-    marginBottom: 8
+  mainTitle: {
+    fontSize: 22,
+    fontWeight: '900',
+    letterSpacing: -0.3
+  },
+  mainSubtitle: {
+    fontSize: 13,
+    marginTop: 3,
+    fontWeight: '500'
+  },
+  sectionCard: {
+    borderRadius: 20,
+    padding: 16,
+    borderWidth: 1,
+    marginBottom: 14
+  },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 10
+  },
+  sectionCardTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+    marginBottom: 10
   },
   catScroll: {
     gap: 8,
-    paddingVertical: 4
+    paddingVertical: 2
   },
   catPill: {
     paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#CBD5E1'
-  },
-  catPillActive: {
-    backgroundColor: '#0F766E',
-    borderColor: '#0F766E'
+    borderRadius: 14,
+    borderWidth: 1
   },
   catText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#475569'
+    fontSize: 12
   },
-  catTextActive: {
-    color: '#FFFFFF'
+  inputLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    marginBottom: 6
   },
   input: {
-    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
     borderRadius: 14,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 16,
-    color: '#0F172A',
-    borderWidth: 1.5,
-    borderColor: '#CBD5E1'
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 14
   },
   textArea: {
-    height: 110,
+    minHeight: 90,
     textAlignVertical: 'top'
   },
   budgetRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
     borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: '#CBD5E1',
-    overflow: 'hidden'
+    borderWidth: 1,
+    paddingHorizontal: 8,
+    paddingVertical: 4
+  },
+  currencyPill: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 10
   },
   currencyPrefix: {
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    backgroundColor: '#F1F5F9',
-    fontSize: 16,
-    fontWeight: '800',
-    color: '#0F766E',
-    borderRightWidth: 1,
-    borderRightColor: '#CBD5E1'
+    fontSize: 13,
+    fontWeight: '800'
   },
   budgetInput: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#0F172A'
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    fontSize: 16,
+    fontWeight: '800'
+  },
+  quickBudgetRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 10
+  },
+  quickAmtPill: {
+    flex: 1,
+    paddingVertical: 7,
+    borderRadius: 10,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  quickAmtText: {
+    fontSize: 12
   },
   locationBanner: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    backgroundColor: '#F0FDFA',
-    padding: 14,
-    borderRadius: 14,
+    padding: 16,
+    borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#CCFBF1'
+    marginTop: 2
   },
   locationBannerTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#0F766E'
+    fontSize: 14,
+    fontWeight: '800'
   },
   locationBannerSub: {
     fontSize: 12,
-    color: '#64748B'
+    marginTop: 2
   }
 });

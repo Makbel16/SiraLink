@@ -1,8 +1,9 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Calendar, User, Wrench, ChevronRight } from 'lucide-react-native';
+import { Calendar, User, Wrench, ChevronRight, DollarSign } from 'lucide-react-native';
 import { JobRequest, JobStatus } from '../types/index';
 import { Badge } from './Badge';
 import { useTranslation } from '../utils/i18n';
+import { useTheme } from '../context/ThemeContext';
 
 interface JobCardProps {
   job: JobRequest;
@@ -12,6 +13,7 @@ interface JobCardProps {
 
 export function JobCard({ job, onPress, isWorkerPerspective = false }: JobCardProps) {
   const { t } = useTranslation();
+  const { colors, isDark } = useTheme();
 
   const getStatusBadge = (status: JobStatus) => {
     switch (status) {
@@ -45,43 +47,69 @@ export function JobCard({ job, onPress, isWorkerPerspective = false }: JobCardPr
     <TouchableOpacity
       activeOpacity={0.85}
       onPress={() => onPress(job)}
-      style={styles.card}
+      style={[
+        styles.card,
+        {
+          backgroundColor: colors.surfaceCard,
+          borderColor: colors.border
+        },
+        colors.cardShadow
+      ]}
     >
       <View style={styles.topRow}>
-        <View style={styles.categoryPill}>
-          <Wrench size={13} color="#0F766E" />
-          <Text style={styles.categoryText}>{job.category}</Text>
+        <View
+          style={[
+            styles.categoryPill,
+            {
+              backgroundColor: isDark ? 'rgba(20, 184, 166, 0.15)' : '#F0FDFA',
+              borderColor: isDark ? 'rgba(20, 184, 166, 0.3)' : '#CCFBF1'
+            }
+          ]}
+        >
+          <Wrench size={13} color={colors.primary} />
+          <Text style={[styles.categoryText, { color: colors.primary }]}>{job.category}</Text>
         </View>
         {getStatusBadge(job.status)}
       </View>
 
-      <Text style={styles.titleText} numberOfLines={1}>
+      <Text style={[styles.titleText, { color: colors.textPrimary }]} numberOfLines={1}>
         {job.title || `${job.category} Service`}
       </Text>
 
       {job.text_description ? (
-        <Text style={styles.descriptionText} numberOfLines={2}>
+        <Text style={[styles.descriptionText, { color: colors.textSecondary }]} numberOfLines={2}>
           {job.text_description}
         </Text>
       ) : null}
 
-      <View style={styles.footerRow}>
+      <View style={[styles.footerRow, { borderTopColor: colors.borderSubtle }]}>
         <View style={styles.counterpartyBox}>
-          <User size={14} color="#64748B" />
-          <Text style={styles.counterpartyText} numberOfLines={1}>
+          <User size={14} color={colors.textSecondary} />
+          <Text style={[styles.counterpartyText, { color: colors.textSecondary }]} numberOfLines={1}>
             {counterpartyName}
           </Text>
         </View>
 
         <View style={styles.rightFooter}>
           {job.offered_price_etb ? (
-            <Text style={styles.priceText}>{job.offered_price_etb} ETB</Text>
+            <View
+              style={[
+                styles.pricePill,
+                {
+                  backgroundColor: isDark ? 'rgba(20, 184, 166, 0.18)' : '#CCFBF1'
+                }
+              ]}
+            >
+              <Text style={[styles.priceText, { color: colors.primary }]}>
+                {job.offered_price_etb} ETB
+              </Text>
+            </View>
           ) : null}
           <View style={styles.dateBox}>
-            <Calendar size={12} color="#94A3B8" />
-            <Text style={styles.dateText}>{formatDate(job.created_at)}</Text>
+            <Calendar size={12} color={colors.textMuted} />
+            <Text style={[styles.dateText, { color: colors.textMuted }]}>{formatDate(job.created_at)}</Text>
           </View>
-          <ChevronRight size={16} color="#94A3B8" />
+          <ChevronRight size={16} color={colors.textMuted} />
         </View>
       </View>
     </TouchableOpacity>
@@ -90,57 +118,47 @@ export function JobCard({ job, onPress, isWorkerPerspective = false }: JobCardPr
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 18,
+    borderRadius: 20,
     padding: 16,
     marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2
+    borderWidth: 1
   },
   topRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 8
+    marginBottom: 10
   },
   categoryPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    backgroundColor: '#F0FDFA',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6
+    gap: 5,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    borderRadius: 8,
+    borderWidth: 1
   },
   categoryText: {
     fontSize: 12,
-    fontWeight: '700',
-    color: '#0F766E'
+    fontWeight: '700'
   },
   titleText: {
     fontSize: 16,
-    fontWeight: '700',
-    color: '#0F172A',
-    marginBottom: 4
+    fontWeight: '800',
+    marginBottom: 4,
+    letterSpacing: -0.2
   },
   descriptionText: {
     fontSize: 13,
-    color: '#64748B',
     lineHeight: 18,
-    marginBottom: 10
+    marginBottom: 12
   },
   footerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#F8FAFC'
+    paddingTop: 12,
+    borderTopWidth: 1
   },
   counterpartyBox: {
     flexDirection: 'row',
@@ -150,18 +168,21 @@ const styles = StyleSheet.create({
   },
   counterpartyText: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#334155'
+    fontWeight: '600'
   },
   rightFooter: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8
   },
+  pricePill: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6
+  },
   priceText: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: '#0F766E'
+    fontSize: 13,
+    fontWeight: '800'
   },
   dateBox: {
     flexDirection: 'row',
@@ -169,7 +190,6 @@ const styles = StyleSheet.create({
     gap: 4
   },
   dateText: {
-    fontSize: 12,
-    color: '#94A3B8'
+    fontSize: 12
   }
 });

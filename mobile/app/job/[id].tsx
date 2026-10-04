@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, SafeAreaView, TextInput } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Phone, Star, CheckCircle, Clock, MapPin, AlertTriangle } from 'lucide-react-native';
+import { Phone, Star, CheckCircle, Clock, MapPin, AlertTriangle, Sparkles, Send } from 'lucide-react-native';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from '../../utils/i18n';
+import { useTheme } from '../../context/ThemeContext';
 import { Badge } from '../../components/Badge';
 import { Button } from '../../components/Button';
 import { VoicePlayer } from '../../components/VoicePlayer';
@@ -19,6 +20,7 @@ export default function JobDetailScreen() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const { t } = useTranslation();
+  const { colors, isDark } = useTheme();
 
   const [rating, setRating] = useState<number>(5);
   const [comment, setComment] = useState<string>('');
@@ -67,47 +69,96 @@ export default function JobDetailScreen() {
   const currentStep = statuses.indexOf(job.status);
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-        {/* Status Header Badge */}
-        <View style={styles.statusHeader}>
-          <View>
-            <Text style={styles.jobCategoryText}>{job.category}</Text>
-            <Text style={styles.jobTitleText}>{job.title || 'የስራ ጥያቄ'}</Text>
+        {/* Status Header Card */}
+        <View
+          style={[
+            styles.statusHeaderCard,
+            {
+              backgroundColor: colors.surfaceCard,
+              borderColor: colors.border
+            },
+            colors.cardShadow
+          ]}
+        >
+          <View style={styles.headerInfoRow}>
+            <View
+              style={[
+                styles.categoryChip,
+                {
+                  backgroundColor: isDark ? 'rgba(20, 184, 166, 0.18)' : '#CCFBF1'
+                }
+              ]}
+            >
+              <Text style={[styles.jobCategoryText, { color: colors.primary }]}>{job.category}</Text>
+            </View>
+
+            <Badge
+              label={job.status}
+              variant={
+                job.status === 'COMPLETED'
+                  ? 'success'
+                  : job.status === 'CANCELLED'
+                  ? 'danger'
+                  : 'warning'
+              }
+            />
           </View>
-          <Badge
-            label={job.status}
-            variant={
-              job.status === 'COMPLETED'
-                ? 'success'
-                : job.status === 'CANCELLED'
-                ? 'danger'
-                : 'warning'
-            }
-          />
+
+          <Text style={[styles.jobTitleText, { color: colors.textPrimary }]}>
+            {job.title || 'የስራ ጥያቄ'}
+          </Text>
         </View>
 
-        {/* Visual Lifecycle Stepper */}
-        <View style={styles.timelineContainer}>
+        {/* Visual Lifecycle Stepper Card */}
+        <View
+          style={[
+            styles.sectionCard,
+            {
+              backgroundColor: colors.surfaceCard,
+              borderColor: colors.border
+            },
+            colors.cardShadow
+          ]}
+        >
+          <Text style={[styles.sectionCardTitle, { color: colors.textSecondary }]}>
+            የስራው ሂደት (Status Lifecycle)
+          </Text>
           <View style={styles.timelineRow}>
             {statuses.map((s, idx) => {
               const isPastOrCurrent = currentStep >= idx;
+              const isCurrent = job.status === s;
               return (
                 <View key={s} style={styles.stepWrapper}>
                   <View
                     style={[
                       styles.stepCircle,
-                      isPastOrCurrent && styles.stepCircleActive,
-                      job.status === s && styles.stepCircleCurrent
+                      {
+                        backgroundColor: isPastOrCurrent
+                          ? colors.primary
+                          : isDark
+                          ? colors.surfaceSubtle
+                          : '#E2E8F0',
+                        borderColor: isCurrent ? colors.accent : 'transparent'
+                      }
                     ]}
                   >
                     {isPastOrCurrent ? (
                       <CheckCircle size={14} color="#FFFFFF" />
                     ) : (
-                      <Clock size={14} color="#94A3B8" />
+                      <Clock size={14} color={colors.textMuted} />
                     )}
                   </View>
-                  <Text style={[styles.stepLabel, isPastOrCurrent && styles.stepLabelActive]}>
+                  <Text
+                    style={[
+                      styles.stepLabel,
+                      {
+                        color: isPastOrCurrent ? colors.textPrimary : colors.textMuted,
+                        fontWeight: isCurrent ? '800' : '600'
+                      }
+                    ]}
+                  >
                     {s}
                   </Text>
                 </View>
@@ -118,54 +169,114 @@ export default function JobDetailScreen() {
 
         {/* Audio Recording Player if recorded */}
         {job.audio_description_url && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>የደንበኛው የድምጽ መግለጫ (Voice Request)</Text>
-            <VoicePlayer audioUrl={job.audio_description_url} title="የድምጽ ቅጂውን ያዳምጡ" />
+          <View
+            style={[
+              styles.sectionCard,
+              {
+                backgroundColor: colors.surfaceCard,
+                borderColor: colors.border
+              },
+              colors.cardShadow
+            ]}
+          >
+            <View style={styles.sectionHeaderRow}>
+              <Sparkles size={16} color={colors.accent} />
+              <Text style={[styles.sectionCardTitle, { color: colors.textPrimary }]}>
+                የተቀረጸው የድምጽ መግለጫ (Voice Request)
+              </Text>
+            </View>
+            <VoicePlayer audioUrl={job.audio_description_url} title="የደንበኛው ድምጽ" />
           </View>
         )}
 
-        {/* Text Description */}
+        {/* Text Description Card */}
         {job.text_description && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>የስራ ዝርዝር (Description)</Text>
-            <View style={styles.descriptionBox}>
-              <Text style={styles.descriptionText}>{job.text_description}</Text>
+          <View
+            style={[
+              styles.sectionCard,
+              {
+                backgroundColor: colors.surfaceCard,
+                borderColor: colors.border
+              },
+              colors.cardShadow
+            ]}
+          >
+            <Text style={[styles.sectionCardTitle, { color: colors.textPrimary }]}>
+              የስራ ዝርዝር (Description)
+            </Text>
+            <View
+              style={[
+                styles.descriptionBox,
+                {
+                  backgroundColor: isDark ? colors.surfaceSubtle : '#F8FAFC',
+                  borderColor: colors.borderSubtle
+                }
+              ]}
+            >
+              <Text style={[styles.descriptionText, { color: colors.textSecondary }]}>
+                {job.text_description}
+              </Text>
             </View>
           </View>
         )}
 
-        {/* Counterparty info (Worker / Client) */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
+        {/* Counterparty Info Card */}
+        <View
+          style={[
+            styles.sectionCard,
+            {
+              backgroundColor: colors.surfaceCard,
+              borderColor: colors.border
+            },
+            colors.cardShadow
+          ]}
+        >
+          <Text style={[styles.sectionCardTitle, { color: colors.textPrimary }]}>
             {isClient ? 'የተመደበው ባለሙያ (Assigned Worker)' : 'የስራው ባለቤት (Client)'}
           </Text>
-          <View style={styles.personCard}>
+
+          <View style={styles.personCardRow}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.personName}>
+              <Text style={[styles.personName, { color: colors.textPrimary }]}>
                 {isClient ? job.worker_name || 'በመፈለግ ላይ...' : job.client_name || 'ደንበኛ'}
               </Text>
-              <Text style={styles.personPhone}>
+              <Text style={[styles.personPhone, { color: colors.textSecondary }]}>
                 {isClient ? job.worker_phone || 'ስልክ ይገለጻል' : job.client_phone || ''}
               </Text>
             </View>
 
             {(job.worker_phone || job.client_phone) && (
               <TouchableOpacity
-                style={styles.callBtn}
-                onPress={() => Alert.alert('ደውል', `ደውል ወደ ${isClient ? job.worker_phone : job.client_phone}`)}
+                style={[styles.callBtn, { backgroundColor: colors.primary }]}
+                activeOpacity={0.8}
+                onPress={() =>
+                  Alert.alert('ደውል', `ደውል ወደ ${isClient ? job.worker_phone : job.client_phone}`)
+                }
               >
-                <Phone size={18} color="#FFFFFF" />
+                <Phone size={16} color="#FFFFFF" />
                 <Text style={styles.callText}>ደውል</Text>
               </TouchableOpacity>
             )}
           </View>
         </View>
 
-        {/* Budget details */}
+        {/* Budget Details Banner */}
         {job.offered_price_etb && (
-          <View style={styles.priceBanner}>
-            <Text style={styles.priceLabel}>የተስማሙበት ዋጋ (Offered Price)</Text>
-            <Text style={styles.priceValue}>{job.offered_price_etb} ETB</Text>
+          <View
+            style={[
+              styles.priceBanner,
+              {
+                backgroundColor: isDark ? '#142834' : '#F0FDFA',
+                borderColor: isDark ? 'rgba(20, 184, 166, 0.3)' : '#CCFBF1'
+              }
+            ]}
+          >
+            <Text style={[styles.priceLabel, { color: colors.textSecondary }]}>
+              የተስማሙበት ዋጋ (Offered Price)
+            </Text>
+            <Text style={[styles.priceValue, { color: colors.primary }]}>
+              {job.offered_price_etb} ETB
+            </Text>
           </View>
         )}
 
@@ -176,20 +287,31 @@ export default function JobDetailScreen() {
             onPress={handleCompleteJob}
             variant="primary"
             size="lg"
-            style={{ marginTop: 20 }}
+            style={{ marginTop: 18 }}
           />
         )}
 
         {/* Rating Submission Section if job is COMPLETED */}
         {isClient && job.status === 'COMPLETED' && (
-          <View style={styles.ratingSection}>
-            <Text style={styles.ratingSectionTitle}>ባለሙያውን ይገምግሙ (Rate Worker)</Text>
+          <View
+            style={[
+              styles.sectionCard,
+              {
+                backgroundColor: colors.surfaceCard,
+                borderColor: colors.border
+              },
+              colors.cardShadow
+            ]}
+          >
+            <Text style={[styles.sectionCardTitle, { color: colors.textPrimary }]}>
+              ባለሙያውን ይገምግሙ (Rate Worker)
+            </Text>
             <View style={styles.starsRow}>
               {[1, 2, 3, 4, 5].map((star) => (
                 <TouchableOpacity key={star} onPress={() => setRating(star)}>
                   <Star
-                    size={36}
-                    color={star <= rating ? '#F59E0B' : '#CBD5E1'}
+                    size={34}
+                    color={star <= rating ? '#F59E0B' : colors.textMuted}
                     fill={star <= rating ? '#F59E0B' : 'none'}
                   />
                 </TouchableOpacity>
@@ -197,9 +319,16 @@ export default function JobDetailScreen() {
             </View>
 
             <TextInput
-              style={styles.reviewInput}
+              style={[
+                styles.reviewInput,
+                {
+                  backgroundColor: isDark ? colors.surfaceSubtle : '#F8FAFC',
+                  borderColor: colors.border,
+                  color: colors.textPrimary
+                }
+              ]}
               placeholder="ስለ ስራው ጥራት እና ፍጥነት አስተያየት ይጻፉ..."
-              placeholderTextColor="#94A3B8"
+              placeholderTextColor={colors.textMuted}
               multiline
               numberOfLines={3}
               value={comment}
@@ -221,180 +350,142 @@ export default function JobDetailScreen() {
 
 const styles = StyleSheet.create({
   safeArea: {
-    flex: 1,
-    backgroundColor: '#F8FAFC'
+    flex: 1
   },
   container: {
-    padding: 20,
+    padding: 18,
     paddingBottom: 40
   },
-  statusHeader: {
+  statusHeaderCard: {
+    borderRadius: 22,
+    padding: 18,
+    borderWidth: 1,
+    marginBottom: 14
+  },
+  headerInfoRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#FFFFFF',
-    padding: 18,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    marginBottom: 16
+    marginBottom: 10
+  },
+  categoryChip: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8
   },
   jobCategoryText: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: '#0F766E'
+    fontSize: 12,
+    fontWeight: '800'
   },
   jobTitleText: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#0F172A',
-    marginTop: 2
+    fontSize: 20,
+    fontWeight: '900',
+    letterSpacing: -0.3
   },
-  timelineContainer: {
-    backgroundColor: '#FFFFFF',
+  sectionCard: {
+    borderRadius: 20,
     padding: 16,
-    borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    marginBottom: 20
+    marginBottom: 14
+  },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 10
+  },
+  sectionCardTitle: {
+    fontSize: 14,
+    fontWeight: '800',
+    marginBottom: 10
   },
   timelineRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8
   },
   stepWrapper: {
     alignItems: 'center',
-    gap: 6
+    flex: 1
   },
   stepCircle: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: '#E2E8F0',
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     alignItems: 'center',
-    justifyContent: 'center'
-  },
-  stepCircleActive: {
-    backgroundColor: '#0F766E'
-  },
-  stepCircleCurrent: {
-    backgroundColor: '#D97706',
-    borderWidth: 2,
-    borderColor: '#FEF3C7'
+    justifyContent: 'center',
+    borderWidth: 2
   },
   stepLabel: {
     fontSize: 10,
-    fontWeight: '700',
-    color: '#94A3B8'
-  },
-  stepLabelActive: {
-    color: '#0F172A'
-  },
-  section: {
-    marginBottom: 18
-  },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#334155',
-    marginBottom: 8
+    marginTop: 6
   },
   descriptionBox: {
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#E2E8F0'
+    padding: 14,
+    borderRadius: 14,
+    borderWidth: 1
   },
   descriptionText: {
     fontSize: 14,
-    color: '#475569',
-    lineHeight: 22
+    lineHeight: 20
   },
-  personCard: {
+  personCardRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    gap: 12
+    justifyContent: 'space-between'
   },
   personName: {
     fontSize: 16,
-    fontWeight: '700',
-    color: '#0F172A'
+    fontWeight: '800'
   },
   personPhone: {
     fontSize: 13,
-    color: '#64748B',
     marginTop: 2
   },
   callBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#0F766E',
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 12
   },
   callText: {
     color: '#FFFFFF',
-    fontWeight: '700',
-    fontSize: 14
+    fontWeight: '800',
+    fontSize: 13
   },
   priceBanner: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#F0FDFA',
     padding: 16,
-    borderRadius: 16,
+    borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#CCFBF1',
-    marginBottom: 18
+    marginBottom: 14
   },
   priceLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#0F766E'
+    fontSize: 13,
+    fontWeight: '700'
   },
   priceValue: {
     fontSize: 18,
-    fontWeight: '900',
-    color: '#0F766E'
-  },
-  ratingSection: {
-    backgroundColor: '#FFFFFF',
-    padding: 20,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    marginTop: 20,
-    gap: 14
-  },
-  ratingSectionTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: '#0F172A',
-    textAlign: 'center'
+    fontWeight: '900'
   },
   starsRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 10
+    gap: 8,
+    marginVertical: 12
   },
   reviewInput: {
-    backgroundColor: '#F8FAFC',
-    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderRadius: 14,
     padding: 12,
     fontSize: 14,
-    color: '#0F172A',
-    height: 80,
-    textAlignVertical: 'top'
+    minHeight: 70,
+    textAlignVertical: 'top',
+    marginBottom: 14
   }
 });

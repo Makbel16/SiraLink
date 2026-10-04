@@ -10,11 +10,12 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
-import { MapPin, Bell, SlidersHorizontal } from 'lucide-react-native';
+import { MapPin, Bell, SlidersHorizontal, Sparkles, Navigation, Search, PenLine } from 'lucide-react-native';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useLocation } from '../../context/LocationContext';
 import { useTranslation } from '../../utils/i18n';
+import { useTheme } from '../../context/ThemeContext';
 import { VoiceRecorder } from '../../components/VoiceRecorder';
 import { MapView } from '../../components/MapView';
 import { LoadingState } from '../../components/LoadingState';
@@ -25,6 +26,7 @@ export default function ClientHomeScreen() {
   const { user } = useAuth();
   const { currentLocation, refreshLocation } = useLocation();
   const { t } = useTranslation();
+  const { colors, isDark } = useTheme();
 
   const [selectedCategory, setSelectedCategory] = useState<JobCategory | undefined>(undefined);
   const [radiusKm, setRadiusKm] = useState<number>(10);
@@ -60,7 +62,6 @@ export default function ClientHomeScreen() {
   ];
 
   const handleTranscriptionComplete = (result: TranscriptionResult) => {
-    // Navigate to job creation with transcribed audio & detected category
     router.push({
       pathname: '/job/create',
       params: {
@@ -96,48 +97,130 @@ export default function ClientHomeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
         refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={onRefresh} />}
         showsVerticalScrollIndicator={false}
       >
         {/* Top Header Bar */}
-        <View style={styles.headerBar}>
+        <View
+          style={[
+            styles.headerBar,
+            {
+              backgroundColor: colors.surfaceCard,
+              borderBottomColor: colors.border
+            }
+          ]}
+        >
           <View>
-            <Text style={styles.brandText}>ስራLink</Text>
-            <View style={styles.locationRow}>
-              <MapPin size={13} color="#0F766E" />
-              <Text style={styles.locationText} numberOfLines={1}>
+            <View style={styles.brandRow}>
+              <Text style={[styles.brandText, { color: colors.primary }]}>ስራLink</Text>
+              <View style={[styles.brandDot, { backgroundColor: colors.accent }]} />
+            </View>
+            <TouchableOpacity
+              style={styles.locationRow}
+              activeOpacity={0.7}
+              onPress={refreshLocation}
+            >
+              <MapPin size={13} color={colors.primary} />
+              <Text style={[styles.locationText, { color: colors.textSecondary }]} numberOfLines={1}>
                 {currentLocation.district || 'Addis Ababa'}
               </Text>
-            </View>
+            </TouchableOpacity>
           </View>
 
           <TouchableOpacity
-            style={styles.bellButton}
+            style={[
+              styles.bellButton,
+              {
+                backgroundColor: isDark ? colors.surfaceSubtle : '#F1F5F9'
+              }
+            ]}
             onPress={() => router.push('/(tabs)/messages')}
           >
-            <Bell size={20} color="#0F172A" />
+            <Bell size={20} color={colors.textPrimary} />
+            <View style={[styles.unreadDot, { backgroundColor: colors.danger }]} />
           </TouchableOpacity>
         </View>
 
         {/* Voice-First Hero Card */}
-        <View style={styles.voiceHeroCard}>
-          <Text style={styles.heroGreeting}>
-            {user?.full_name ? `ሰላም ${user.full_name}` : t('welcome')}
-          </Text>
-          <Text style={styles.heroTitle}>{t('what_do_you_need')}</Text>
+        <View
+          style={[
+            styles.voiceHeroCard,
+            {
+              backgroundColor: colors.surfaceCard,
+              borderColor: colors.border
+            },
+            colors.cardShadow
+          ]}
+        >
+          {/* Subtle Ambient Glow */}
+          <View
+            style={[
+              styles.heroAmbientGlow,
+              {
+                backgroundColor: isDark ? colors.primaryGlow : 'rgba(13, 148, 136, 0.05)'
+              }
+            ]}
+          />
 
+          <View style={styles.heroTextRow}>
+            <View style={styles.greetingPill}>
+              <Sparkles size={12} color={colors.accent} />
+              <Text style={[styles.heroGreeting, { color: colors.accent }]}>
+                {user?.full_name ? `ሰላም ${user.full_name}` : t('welcome')}
+              </Text>
+            </View>
+          </View>
+
+          <Text style={[styles.heroTitle, { color: colors.textPrimary }]}>
+            {t('what_do_you_need')}
+          </Text>
+
+          {/* Voice Recording Centerpiece */}
           <VoiceRecorder
             onTranscriptionComplete={handleTranscriptionComplete}
             onManualInputRequested={handleManualInput}
           />
+
+          {/* Quick Voice Prompt Suggestions */}
+          <View style={styles.suggestionsContainer}>
+            <Text style={[styles.suggestionsLabel, { color: colors.textMuted }]}>
+              ለምሳሌ (Quick Examples):
+            </Text>
+            <View style={styles.suggestionsRow}>
+              {[
+                { label: '🔧 የቧንቧ ጥገና', cat: 'PLUMBING' as JobCategory },
+                { label: '⚡ የኤሌክትሪክ ሰራተኛ', cat: 'ELECTRICAL' as JobCategory },
+                { label: '🧹 የቤት ጽዳት', cat: 'CLEANING' as JobCategory }
+              ].map((sug, i) => (
+                <TouchableOpacity
+                  key={i}
+                  activeOpacity={0.75}
+                  onPress={() => setSelectedCategory(sug.cat)}
+                  style={[
+                    styles.suggestionPill,
+                    {
+                      backgroundColor: isDark ? colors.surfaceSubtle : '#F8FAFC',
+                      borderColor: colors.borderSubtle
+                    }
+                  ]}
+                >
+                  <Text style={[styles.suggestionText, { color: colors.textSecondary }]}>
+                    {sug.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
         </View>
 
         {/* Category Filter Chips */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>{t('category')}</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
+            {t('category')} (የስራ ዘርፎች)
+          </Text>
         </View>
 
         <ScrollView
@@ -152,11 +235,26 @@ export default function ClientHomeScreen() {
                 key={cat.key || idx}
                 activeOpacity={0.8}
                 onPress={() => setSelectedCategory(cat.key)}
-                style={[styles.categoryChip, isSelected && styles.categoryChipActive]}
+                style={[
+                  styles.categoryChip,
+                  {
+                    backgroundColor: isSelected
+                      ? colors.primary
+                      : colors.surfaceCard,
+                    borderColor: isSelected ? colors.primary : colors.border
+                  },
+                  colors.cardShadow
+                ]}
               >
                 <Text style={styles.categoryEmoji}>{cat.emoji}</Text>
                 <Text
-                  style={[styles.categoryChipText, isSelected && styles.categoryChipTextActive]}
+                  style={[
+                    styles.categoryChipText,
+                    {
+                      color: isSelected ? '#FFFFFF' : colors.textPrimary,
+                      fontWeight: isSelected ? '800' : '600'
+                    }
+                  ]}
                 >
                   {cat.label}
                 </Text>
@@ -168,37 +266,65 @@ export default function ClientHomeScreen() {
         {/* Nearby Workers Spatial Search Section */}
         <View style={styles.sectionHeader}>
           <View style={styles.nearbyTitleRow}>
-            <Text style={styles.sectionTitle}>{t('nearby_workers')}</Text>
-            <Text style={styles.workerCountText}>
+            <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
+              {t('nearby_workers')}
+            </Text>
+            <Text style={[styles.workerCountText, { color: colors.primary }]}>
               {workers.length > 0 ? `(${workers.length} ተገኝተዋል)` : ''}
             </Text>
           </View>
 
           {/* Radius selector */}
-          <View style={styles.radiusSelector}>
-            {[5, 10, 20].map((r) => (
-              <TouchableOpacity
-                key={r}
-                onPress={() => setRadiusKm(r)}
-                style={[styles.radiusBtn, radiusKm === r && styles.radiusBtnActive]}
-              >
-                <Text style={[styles.radiusText, radiusKm === r && styles.radiusTextActive]}>
-                  {r}km
-                </Text>
-              </TouchableOpacity>
-            ))}
+          <View
+            style={[
+              styles.radiusSelector,
+              {
+                backgroundColor: isDark ? colors.surfaceSubtle : '#F1F5F9'
+              }
+            ]}
+          >
+            {[5, 10, 20].map((r) => {
+              const isActive = radiusKm === r;
+              return (
+                <TouchableOpacity
+                  key={r}
+                  onPress={() => setRadiusKm(r)}
+                  style={[
+                    styles.radiusBtn,
+                    isActive && [
+                      styles.radiusBtnActive,
+                      { backgroundColor: colors.surface, shadowColor: colors.textPrimary }
+                    ]
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.radiusText,
+                      {
+                        color: isActive ? colors.primary : colors.textMuted,
+                        fontWeight: isActive ? '800' : '600'
+                      }
+                    ]}
+                  >
+                    {r}km
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </View>
 
         {isWorkersLoading ? (
           <LoadingState message="ባለሙያዎችን በመፈለግ ላይ..." />
         ) : (
-          <MapView
-            userLocation={currentLocation}
-            workers={workers}
-            onSelectWorker={handleSelectWorker}
-            onRequestWorker={handleRequestWorker}
-          />
+          <View style={styles.mapCardWrapper}>
+            <MapView
+              userLocation={currentLocation}
+              workers={workers}
+              onSelectWorker={handleSelectWorker}
+              onRequestWorker={handleRequestWorker}
+            />
+          </View>
         )}
       </ScrollView>
     </SafeAreaView>
@@ -207,8 +333,7 @@ export default function ClientHomeScreen() {
 
 const styles = StyleSheet.create({
   safeArea: {
-    flex: 1,
-    backgroundColor: '#F8FAFC'
+    flex: 1
   },
   scrollContainer: {
     paddingBottom: 40
@@ -219,16 +344,23 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingTop: 12,
-    paddingBottom: 10,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9'
+    paddingBottom: 12,
+    borderBottomWidth: 1
+  },
+  brandRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4
   },
   brandText: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '900',
-    color: '#0F766E',
-    letterSpacing: 0.5
+    letterSpacing: -0.3
+  },
+  brandDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3
   },
   locationRow: {
     flexDirection: 'row',
@@ -238,120 +370,149 @@ const styles = StyleSheet.create({
   },
   locationText: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#64748B'
+    fontWeight: '600'
   },
   bellButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: '#F1F5F9',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    position: 'relative'
+  },
+  unreadDot: {
+    position: 'absolute',
+    top: 10,
+    right: 11,
+    width: 8,
+    height: 8,
+    borderRadius: 4
   },
   voiceHeroCard: {
     marginHorizontal: 16,
     marginTop: 16,
-    paddingVertical: 20,
-    paddingHorizontal: 16,
-    backgroundColor: '#FFFFFF',
+    paddingVertical: 22,
+    paddingHorizontal: 18,
     borderRadius: 24,
-    shadowColor: '#0F766E',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    elevation: 4,
     borderWidth: 1,
-    borderColor: '#E6F4F1',
-    alignItems: 'center'
+    position: 'relative',
+    overflow: 'hidden'
+  },
+  heroAmbientGlow: {
+    position: 'absolute',
+    top: -40,
+    right: -40,
+    width: 130,
+    height: 130,
+    borderRadius: 65
+  },
+  heroTextRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6
+  },
+  greetingPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5
   },
   heroGreeting: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#0F766E',
-    marginBottom: 4
+    fontSize: 13,
+    fontWeight: '800'
   },
   heroTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: '#0F172A',
-    textAlign: 'center',
+    fontSize: 21,
+    fontWeight: '900',
+    marginBottom: 16,
+    letterSpacing: -0.3
+  },
+  suggestionsContainer: {
+    marginTop: 18,
+    paddingTop: 14,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(150, 150, 150, 0.1)'
+  },
+  suggestionsLabel: {
+    fontSize: 11,
+    fontWeight: '700',
     marginBottom: 8
+  },
+  suggestionsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8
+  },
+  suggestionPill: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 10,
+    borderWidth: 1
+  },
+  suggestionText: {
+    fontSize: 12,
+    fontWeight: '600'
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    marginTop: 22,
-    marginBottom: 10
+    marginTop: 24,
+    marginBottom: 12
   },
   sectionTitle: {
     fontSize: 17,
     fontWeight: '800',
-    color: '#0F172A'
+    letterSpacing: -0.2
   },
   nearbyTitleRow: {
     flexDirection: 'row',
-    alignItems: 'baseline',
+    alignItems: 'center',
     gap: 6
   },
   workerCountText: {
     fontSize: 13,
-    color: '#64748B',
-    fontWeight: '600'
+    fontWeight: '800'
   },
   radiusSelector: {
     flexDirection: 'row',
-    backgroundColor: '#E2E8F0',
-    borderRadius: 8,
-    padding: 2
+    borderRadius: 10,
+    padding: 3
   },
   radiusBtn: {
-    paddingHorizontal: 8,
+    paddingHorizontal: 9,
     paddingVertical: 4,
-    borderRadius: 6
+    borderRadius: 8
   },
   radiusBtnActive: {
-    backgroundColor: '#0F766E'
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2
   },
   radiusText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#475569'
-  },
-  radiusTextActive: {
-    color: '#FFFFFF'
+    fontSize: 12
   },
   categoriesScroll: {
     paddingHorizontal: 16,
-    gap: 8,
-    paddingBottom: 6
+    gap: 10
   },
   categoryChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
     paddingHorizontal: 14,
-    paddingVertical: 9,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#E2E8F0'
-  },
-  categoryChipActive: {
-    backgroundColor: '#0F766E',
-    borderColor: '#0F766E'
+    paddingVertical: 10,
+    borderRadius: 16,
+    borderWidth: 1
   },
   categoryEmoji: {
-    fontSize: 14
+    fontSize: 17
   },
   categoryChipText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#334155'
+    fontSize: 13
   },
-  categoryChipTextActive: {
-    color: '#FFFFFF'
+  mapCardWrapper: {
+    marginTop: 4
   }
 });

@@ -81,7 +81,9 @@ export function VoiceRecorder({
 
         await setAudioModeAsync({
           allowsRecording: true,
-          playsInSilentMode: true
+          playsInSilentMode: true,
+          shouldRouteThroughEarpiece: false,
+          interruptionMode: 'doNotMix'
         });
       }
 
@@ -116,7 +118,9 @@ export function VoiceRecorder({
       if (Platform.OS !== 'web') {
         await setAudioModeAsync({
           allowsRecording: false,
-          playsInSilentMode: true
+          playsInSilentMode: true,
+          shouldRouteThroughEarpiece: false,
+          interruptionMode: 'doNotMix'
         });
       }
       const uri = recorder.uri;
@@ -145,7 +149,9 @@ export function VoiceRecorder({
       if (Platform.OS !== 'web') {
         await setAudioModeAsync({
           allowsRecording: false,
-          playsInSilentMode: true
+          playsInSilentMode: true,
+          shouldRouteThroughEarpiece: false,
+          interruptionMode: 'doNotMix'
         });
       }
     } catch {}
