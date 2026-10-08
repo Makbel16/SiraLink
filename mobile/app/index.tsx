@@ -2,10 +2,12 @@ import { useEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from '../utils/i18n';
 
 export default function EntryScreen() {
   const router = useRouter();
   const { isLoading, isAuthenticated, isWorker } = useAuth();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!isLoading) {
@@ -24,10 +26,10 @@ export default function EntryScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.logoBadge}>
-        <Text style={styles.logoText}>ስራ</Text>
+        <Text style={styles.logoText}>{t('app_name')[0]}</Text>
       </View>
-      <Text style={styles.brandTitle}>SiraLink</Text>
-      <Text style={styles.brandSubtitle}>ስራLink — ኢትዮጵያ</Text>
+      <Text style={styles.brandTitle}>{t('app_name')}</Text>
+      <Text style={styles.brandSubtitle}>{t('app_brand_country')}</Text>
       <ActivityIndicator size="large" color="#0F766E" style={{ marginTop: 28 }} />
     </View>
   );

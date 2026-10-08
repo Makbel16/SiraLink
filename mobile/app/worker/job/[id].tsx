@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Phone, CheckCircle, Navigation, MapPin, Check, X } from 'lucide-react-native';
 import { api } from '../../../services/api';
 import { useTranslation } from '../../../utils/i18n';
+import { useTheme } from '../../../context/ThemeContext';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { VoicePlayer } from '../../../components/VoicePlayer';
@@ -16,6 +17,7 @@ export default function WorkerJobDetailScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { t } = useTranslation();
+  const { colors, isDark } = useTheme();
 
   const {
     data: job,
@@ -27,71 +29,116 @@ export default function WorkerJobDetailScreen() {
     queryFn: () => api.getJobById(id)
   });
 
+  const getStatusLabel = (status: JobStatus) => {
+    switch (status) {
+      case 'OPEN': return t('status_open');
+      case 'ASSIGNED': return t('status_assigned');
+      case 'IN_PROGRESS': return t('status_in_progress');
+      case 'COMPLETED': return t('status_completed');
+      case 'CANCELLED': return t('status_cancelled');
+      default: return status;
+    }
+  };
+
   const handleUpdateStatus = async (status: JobStatus) => {
     try {
       await api.updateJobStatus(id, status);
       Alert.alert(
         status === 'IN_PROGRESS'
-          ? 'ስራው ተጀምሯል!'
+          ? t('job_started_success')
           : status === 'COMPLETED'
-          ? 'ስራው ተጠናቋል!'
-          : 'ሁኔታው ተቀይሯል'
+          ? t('job_completed_worker_success')
+          : t('status_changed')
       );
       queryClient.invalidateQueries({ queryKey: ['worker-job-detail', id] });
     } catch (err: any) {
-      Alert.alert('ስህተት', err.message);
+      Alert.alert(t('error'), err.message);
     }
   };
 
   if (isLoading) return <LoadingState />;
-  if (error || !job) return <ErrorState message="የስራው ዝርዝር አልተገኘም" onRetry={refetch} />;
+  if (error || !job) return <ErrorState message={t('job_details_err')} onRetry={refetch} />;
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View style={styles.header}>
+        <View
+          style={[
+            styles.header,
+            {
+              backgroundColor: colors.surfaceCard,
+              borderColor: colors.border
+            },
+            colors.cardShadow
+          ]}
+        >
           <View>
-            <Text style={styles.categoryText}>{job.category}</Text>
-            <Text style={styles.titleText}>{job.title || 'የደንበኛ ጥያቄ'}</Text>
+            <Text style={[styles.categoryText, { color: colors.primary }]}>{job.category}</Text>
+            <Text style={[styles.titleText, { color: colors.textPrimary }]}>{job.title || t('job_request_default')}</Text>
           </View>
-          <Badge label={job.status} variant="warning" />
+          <Badge
+            label={getStatusLabel(job.status)}
+            variant={
+              job.status === 'COMPLETED'
+                ? 'success'
+                : job.status === 'IN_PROGRESS'
+                ? 'warning'
+                : 'info'
+            }
+          />
         </View>
 
         {/* Customer Audio Player */}
         {job.audio_description_url && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>የደንበኛው ድምጽ (Customer Voice)</Text>
-            <VoicePlayer audioUrl={job.audio_description_url} title="የደንበኛውን ድምጽ ያዳምጡ" />
+            <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('customer_voice')}</Text>
+            <VoicePlayer audioUrl={job.audio_description_url} title={t('listen_customer_voice')} />
           </View>
         )}
 
         {/* Text Description */}
         {job.text_description && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>ዝርዝር (Description)</Text>
-            <View style={styles.descCard}>
-              <Text style={styles.descContent}>{job.text_description}</Text>
+            <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('description_label')}</Text>
+            <View
+              style={[
+                styles.descCard,
+                {
+                  backgroundColor: colors.surfaceCard,
+                  borderColor: colors.border
+                }
+              ]}
+            >
+              <Text style={[styles.descContent, { color: colors.textPrimary }]}>{job.text_description}</Text>
             </View>
           </View>
         )}
 
         {/* Client Contact Details */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>የደንበኛው አድራሻ (Client Contact)</Text>
-          <View style={styles.contactCard}>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('customer_contact')}</Text>
+          <View
+            style={[
+              styles.contactCard,
+              {
+                backgroundColor: colors.surfaceCard,
+                borderColor: colors.border
+              }
+            ]}
+          >
             <View style={{ flex: 1 }}>
-              <Text style={styles.clientName}>{job.client_name || 'ደንበኛ'}</Text>
-              <Text style={styles.clientPhone}>{job.client_phone || 'ስልክ ቁጥር'}</Text>
+              <Text style={[styles.clientName, { color: colors.textPrimary }]}>{job.client_name || t('client')}</Text>
+              <Text style={[styles.clientPhone, { color: colors.textSecondary }]}>{job.client_phone || t('phone_number_label')}</Text>
             </View>
 
             {job.client_phone && (
               <TouchableOpacity
-                style={styles.callBtn}
-                onPress={() => Alert.alert('ደውል', `ደውል ወደ ${job.client_phone}`)}
+                style={[styles.callBtn, { backgroundColor: colors.primary }]}
+                onPress={() => Alert.alert(t('call'), `${t('call')} ${job.client_phone}`)}
               >
                 <Phone size={18} color="#FFFFFF" />
-                <Text style={styles.callText}>ደውል</Text>
+                <Text style={styles.callText}>{t('call')}</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -99,9 +146,17 @@ export default function WorkerJobDetailScreen() {
 
         {/* Price Info */}
         {job.offered_price_etb && (
-          <View style={styles.priceRow}>
-            <Text style={styles.priceLabel}>የተሰጠው ክፍያ (Payment Offer)</Text>
-            <Text style={styles.priceValue}>{job.offered_price_etb} ETB</Text>
+          <View
+            style={[
+              styles.priceRow,
+              {
+                backgroundColor: isDark ? '#142834' : '#F0FDFA',
+                borderColor: isDark ? 'rgba(20, 184, 166, 0.3)' : '#CCFBF1'
+              }
+            ]}
+          >
+            <Text style={[styles.priceLabel, { color: colors.textSecondary }]}>{t('offered_price')}</Text>
+            <Text style={[styles.priceValue, { color: colors.primary }]}>{job.offered_price_etb} {t('etb')}</Text>
           </View>
         )}
 
@@ -109,7 +164,7 @@ export default function WorkerJobDetailScreen() {
         <View style={styles.actionsContainer}>
           {job.status === 'ASSIGNED' && (
             <Button
-              title="ስራውን ጀምር (Start Job)"
+              title={t('start_job')}
               onPress={() => handleUpdateStatus('IN_PROGRESS')}
               size="lg"
               icon={<Check size={20} color="#FFFFFF" />}
@@ -118,7 +173,7 @@ export default function WorkerJobDetailScreen() {
 
           {job.status === 'IN_PROGRESS' && (
             <Button
-              title="ስራውን አጠናቅቄያለሁ (Finish Job)"
+              title={t('complete')}
               onPress={() => handleUpdateStatus('COMPLETED')}
               size="lg"
               icon={<CheckCircle size={20} color="#FFFFFF" />}
@@ -128,7 +183,7 @@ export default function WorkerJobDetailScreen() {
           {job.status === 'COMPLETED' && (
             <View style={styles.completedNotice}>
               <CheckCircle size={24} color="#15803D" />
-              <Text style={styles.completedNoticeText}>ይህ ስራ ተጠናቋል!</Text>
+              <Text style={styles.completedNoticeText}>{t('job_completed_done')}!</Text>
             </View>
           )}
         </View>

@@ -2,12 +2,14 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Check } from 'lucide-react-native';
 import { useTranslation } from '../utils/i18n';
+import { useTheme } from '../context/ThemeContext';
 import { Button } from '../components/Button';
 import { SupportedLanguage } from '../types/index';
 
 export default function LanguageScreen() {
   const router = useRouter();
   const { language, setLanguage, t } = useTranslation();
+  const { colors, isDark } = useTheme();
 
   const languages: { code: SupportedLanguage; label: string; sub: string }[] = [
     { code: 'am', label: 'አማርኛ', sub: 'Amharic' },
@@ -24,10 +26,10 @@ export default function LanguageScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
-        <Text style={styles.title}>{t('select_language')}</Text>
-        <Text style={styles.subtitle}>Choose your preferred language for SiraLink</Text>
+        <Text style={[styles.title, { color: colors.textPrimary }]}>{t('select_language')}</Text>
+        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>{t('choose_language_sub')}</Text>
       </View>
 
       <View style={styles.optionsList}>
@@ -38,17 +40,28 @@ export default function LanguageScreen() {
               key={lang.code}
               activeOpacity={0.85}
               onPress={() => handleSelect(lang.code)}
-              style={[styles.langCard, isSelected && styles.langCardSelected]}
+              style={[
+                styles.langCard,
+                {
+                  backgroundColor: isSelected ? (isDark ? 'rgba(20, 184, 166, 0.15)' : '#F0FDFA') : colors.surfaceCard,
+                  borderColor: isSelected ? colors.primary : colors.border
+                }
+              ]}
             >
               <View>
-                <Text style={[styles.langLabel, isSelected && styles.langLabelSelected]}>
+                <Text
+                  style={[
+                    styles.langLabel,
+                    { color: isSelected ? colors.primary : colors.textPrimary }
+                  ]}
+                >
                   {lang.label}
                 </Text>
-                <Text style={styles.langSub}>{lang.sub}</Text>
+                <Text style={[styles.langSub, { color: colors.textSecondary }]}>{lang.sub}</Text>
               </View>
 
               {isSelected && (
-                <View style={styles.checkCircle}>
+                <View style={[styles.checkCircle, { backgroundColor: colors.primary }]}>
                   <Check size={18} color="#FFFFFF" strokeWidth={3} />
                 </View>
               )}
@@ -59,7 +72,7 @@ export default function LanguageScreen() {
 
       <View style={styles.footer}>
         <Button
-          title={language === 'am' ? 'ቀጥል' : language === 'om' ? 'Itti Fufi' : 'Continue'}
+          title={t('continue')}
           onPress={handleContinue}
           size="lg"
         />

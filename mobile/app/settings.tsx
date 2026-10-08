@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Wifi, Server, Trash2, Globe, Shield, Info, ArrowLeft } from 'lucide-react-native';
+import { Server, Trash2, Globe } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from '../utils/i18n';
-import { Button } from '../components/Button';
+import { useTheme } from '../context/ThemeContext';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const { t, language } = useTranslation();
+  const { colors, isDark } = useTheme();
   const [serverStatus, setServerStatus] = useState<'checking' | 'online' | 'offline'>('checking');
 
   useEffect(() => {
@@ -22,71 +23,146 @@ export default function SettingsScreen() {
   }, []);
 
   const handleClearCache = async () => {
-    Alert.alert('መሸጎጫ አጽዳ (Clear Cache)', 'የተቀመጡ መረጃዎችን ማጽዳት ይፈልጋሉ?', [
-      { text: 'ይቅር (Cancel)', style: 'cancel' },
+    Alert.alert(t('clear_cache_confirm_title'), t('clear_cache_confirm_msg'), [
+      { text: t('cancel'), style: 'cancel' },
       {
-        text: 'አጽዳ (Clear)',
+        text: t('clear_cache'),
         style: 'destructive',
         onPress: async () => {
           await AsyncStorage.clear();
-          Alert.alert('ተሳክቷል', 'መሸጎጫ በተሳካ ሁኔታ ጸድቷል');
+          Alert.alert(t('success'), t('cache_cleared'));
         }
       }
     ]);
   };
 
+  const getLanguageDisplayName = () => {
+    if (language === 'am') return 'አማርኛ';
+    if (language === 'om') return 'Afaan Oromoo';
+    return 'English';
+  };
+
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.container}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
+      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+        {/* Connection Status Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>የግንኙነት ሁኔታ (Connection Status)</Text>
-          <View style={styles.statusCard}>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>
+            {t('connection_status')}
+          </Text>
+          <View
+            style={[
+              styles.statusCard,
+              {
+                backgroundColor: colors.surfaceCard,
+                borderColor: colors.border
+              },
+              colors.cardShadow
+            ]}
+          >
             <View style={styles.statusRow}>
-              <View style={styles.iconCircle}>
-                <Server size={20} color="#0F766E" />
+              <View
+                style={[
+                  styles.iconCircle,
+                  { backgroundColor: isDark ? 'rgba(20, 184, 166, 0.15)' : '#F0FDFA' }
+                ]}
+              >
+                <Server size={20} color={colors.primary} />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.statusTitle}>SiraLink API Server</Text>
-                <Text style={styles.statusSub}>Fastify + PostGIS Database</Text>
+                <Text style={[styles.statusTitle, { color: colors.textPrimary }]}>
+                  {t('api_server')}
+                </Text>
+                <Text style={[styles.statusSub, { color: colors.textSecondary }]}>
+                  {t('database_desc')}
+                </Text>
               </View>
-              <View style={[styles.statusDot, { backgroundColor: '#22C55E' }]} />
+              <View
+                style={[
+                  styles.statusDot,
+                  { backgroundColor: serverStatus === 'offline' ? colors.danger : colors.success }
+                ]}
+              />
             </View>
           </View>
         </View>
 
+        {/* Preferences Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>የመተግበሪያ ቅንብሮች (Preferences)</Text>
-          <View style={styles.menuCard}>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>
+            {t('preferences')}
+          </Text>
+          <View
+            style={[
+              styles.menuCard,
+              {
+                backgroundColor: colors.surfaceCard,
+                borderColor: colors.border
+              },
+              colors.cardShadow
+            ]}
+          >
             <TouchableOpacity
-              style={styles.menuItem}
+              style={[styles.menuItem, { borderBottomColor: colors.borderSubtle }]}
               onPress={() => router.push('/language')}
+              activeOpacity={0.7}
             >
-              <Globe size={18} color="#0F766E" />
+              <Globe size={18} color={colors.primary} />
               <View style={{ flex: 1 }}>
-                <Text style={styles.itemTitle}>{t('select_language')}</Text>
-                <Text style={styles.itemSub}>{language === 'am' ? 'አማርኛ' : language === 'om' ? 'Afaan Oromoo' : 'English'}</Text>
+                <Text style={[styles.itemTitle, { color: colors.textPrimary }]}>
+                  {t('select_language')}
+                </Text>
+                <Text style={[styles.itemSub, { color: colors.textSecondary }]}>
+                  {getLanguageDisplayName()}
+                </Text>
               </View>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.menuItem} onPress={handleClearCache}>
-              <Trash2 size={18} color="#DC2626" />
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={handleClearCache}
+              activeOpacity={0.7}
+            >
+              <Trash2 size={18} color={colors.danger} />
               <View style={{ flex: 1 }}>
-                <Text style={[styles.itemTitle, { color: '#DC2626' }]}>መሸጎጫ አጽዳ (Clear Cache)</Text>
-                <Text style={styles.itemSub}>የተቀመጡ ጊዜያዊ ፋይሎችን ያጽዱ</Text>
+                <Text style={[styles.itemTitle, { color: colors.danger }]}>
+                  {t('clear_cache')}
+                </Text>
+                <Text style={[styles.itemSub, { color: colors.textSecondary }]}>
+                  {t('clear_cache_desc')}
+                </Text>
               </View>
             </TouchableOpacity>
           </View>
         </View>
 
+        {/* About App Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>ስለ መተግበሪያው (About)</Text>
-          <View style={styles.aboutCard}>
-            <Text style={styles.aboutTitle}>SiraLink (ስራLink) Ethiopia</Text>
-            <Text style={styles.aboutDesc}>
-              የድምጽ፣ የአካባቢ እና የአገር ውስጥ ቋንቋዎችን በማስተባበር ፈጣን እና አስተማማኝ የስራ ገበያን የሚፈጥር የኢትዮጵያ ፕላትፎርም።
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>
+            {t('about_app')}
+          </Text>
+          <View
+            style={[
+              styles.aboutCard,
+              {
+                backgroundColor: colors.surfaceCard,
+                borderColor: colors.border
+              },
+              colors.cardShadow
+            ]}
+          >
+            <Text style={[styles.aboutTitle, { color: colors.primary }]}>
+              {t('app_name')}
             </Text>
-            <Text style={styles.aboutMeta}>ስሪት፡ 1.0.0 (Production Release)</Text>
-            <Text style={styles.aboutMeta}>ቦታ፡ አዲስ አበባ፣ ኢትዮጵያ</Text>
+            <Text style={[styles.aboutDesc, { color: colors.textSecondary }]}>
+              {t('about_desc')}
+            </Text>
+            <Text style={[styles.aboutMeta, { color: colors.textMuted }]}>
+              {t('version')}: 1.0.0
+            </Text>
+            <Text style={[styles.aboutMeta, { color: colors.textMuted }]}>
+              {t('location')}: {t('addis_ababa')}
+            </Text>
           </View>
         </View>
       </ScrollView>
@@ -96,8 +172,7 @@ export default function SettingsScreen() {
 
 const styles = StyleSheet.create({
   safeArea: {
-    flex: 1,
-    backgroundColor: '#F8FAFC'
+    flex: 1
   },
   container: {
     padding: 20
@@ -108,15 +183,12 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#334155',
     marginBottom: 10
   },
   statusCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 18,
     padding: 16,
-    borderWidth: 1,
-    borderColor: '#E2E8F0'
+    borderWidth: 1
   },
   statusRow: {
     flexDirection: 'row',
@@ -127,18 +199,15 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#F0FDFA',
     alignItems: 'center',
     justifyContent: 'center'
   },
   statusTitle: {
     fontSize: 15,
-    fontWeight: '700',
-    color: '#0F172A'
+    fontWeight: '700'
   },
   statusSub: {
-    fontSize: 12,
-    color: '#64748B'
+    fontSize: 12
   },
   statusDot: {
     width: 10,
@@ -146,10 +215,8 @@ const styles = StyleSheet.create({
     borderRadius: 5
   },
   menuCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
     overflow: 'hidden'
   },
   menuItem: {
@@ -157,40 +224,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     gap: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F8FAFC'
+    borderBottomWidth: 1
   },
   itemTitle: {
     fontSize: 14,
-    fontWeight: '700',
-    color: '#0F172A'
+    fontWeight: '700'
   },
   itemSub: {
     fontSize: 12,
-    color: '#64748B',
     marginTop: 2
   },
   aboutCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 18,
     padding: 18,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
     gap: 6
   },
   aboutTitle: {
     fontSize: 16,
-    fontWeight: '800',
-    color: '#0F766E'
+    fontWeight: '800'
   },
   aboutDesc: {
     fontSize: 13,
-    color: '#475569',
     lineHeight: 20
   },
   aboutMeta: {
     fontSize: 12,
-    color: '#64748B',
     fontWeight: '600'
   }
 });

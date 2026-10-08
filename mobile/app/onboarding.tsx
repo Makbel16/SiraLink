@@ -12,9 +12,9 @@ export default function OnboardingScreen() {
     <View style={styles.container}>
       <View style={styles.heroSection}>
         <View style={styles.logoBadge}>
-          <Text style={styles.logoGlyph}>ስራ</Text>
+          <Text style={styles.logoGlyph}>{t('app_name')[0]}</Text>
         </View>
-        <Text style={styles.headline}>ስራLink</Text>
+        <Text style={styles.headline}>{t('app_name')}</Text>
         <Text style={styles.subheadline}>{t('tagline')}</Text>
       </View>
 
@@ -27,7 +27,7 @@ export default function OnboardingScreen() {
           <View style={styles.featureText}>
             <Text style={styles.featureTitle}>{t('record_voice')}</Text>
             <Text style={styles.featureDesc}>
-              በአማርኛ፣ በአፋን ኦሮሞ ወይም በእንግሊዝኛ የሚፈልጉትን ስራ በድምጽዎ ይናገሩ
+              {t('onboarding_feature_1_desc')}
             </Text>
           </View>
         </View>
@@ -39,7 +39,7 @@ export default function OnboardingScreen() {
           <View style={styles.featureText}>
             <Text style={styles.featureTitle}>{t('nearby_workers')}</Text>
             <Text style={styles.featureDesc}>
-              በአቅራቢያዎ ያሉ ቧንቧ፣ ኤሌክትሪክና ሌሎች ባለሙያዎችን በካርታ በቀላሉ ያግኙ
+              {t('onboarding_feature_2_desc')}
             </Text>
           </View>
         </View>
@@ -49,9 +49,9 @@ export default function OnboardingScreen() {
             <ShieldCheck size={24} color="#0284C7" />
           </View>
           <View style={styles.featureText}>
-            <Text style={styles.featureTitle}>ግልጽ ዋጋና አስተማማኝ አገልግሎት</Text>
+            <Text style={styles.featureTitle}>{t('onboarding_feature_3_title')}</Text>
             <Text style={styles.featureDesc}>
-              የተረጋገጡ ባለሙያዎች፣ በብር የተተመነ ዋጋና የተጠቃሚዎች ግምገማ
+              {t('onboarding_feature_3_desc')}
             </Text>
           </View>
         </View>

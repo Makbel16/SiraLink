@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Check, X, Play, MapPin, Phone } from 'lucide-react-native';
 import { api } from '../../services/api';
 import { useTranslation } from '../../utils/i18n';
+import { useTheme } from '../../context/ThemeContext';
 import { Button } from '../../components/Button';
 import { VoicePlayer } from '../../components/VoicePlayer';
 import { Badge } from '../../components/Badge';
@@ -15,6 +16,7 @@ export default function WorkerJobsScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { t } = useTranslation();
+  const { colors, isDark } = useTheme();
 
   const {
     data: jobs = [],
@@ -26,32 +28,52 @@ export default function WorkerJobsScreen() {
     queryFn: () => api.getJobs()
   });
 
+  const getStatusLabel = (status: JobStatus) => {
+    switch (status) {
+      case 'OPEN': return t('status_open');
+      case 'ASSIGNED': return t('status_assigned');
+      case 'IN_PROGRESS': return t('status_in_progress');
+      case 'COMPLETED': return t('status_completed');
+      case 'CANCELLED': return t('status_cancelled');
+      default: return status;
+    }
+  };
+
   const handleUpdateStatus = async (jobId: string, status: JobStatus) => {
     try {
       await api.updateJobStatus(jobId, status);
       Alert.alert(
         status === 'IN_PROGRESS'
-          ? 'ስራው ተጀምሯል!'
+          ? t('job_started_success')
           : status === 'COMPLETED'
-          ? 'ስራው ተጠናቋል!'
-          : 'ሁኔታው ተቀይሯል'
+          ? t('job_completed_worker_success')
+          : t('status_changed')
       );
       queryClient.invalidateQueries({ queryKey: ['worker-jobs'] });
     } catch (err: any) {
-      Alert.alert('ስህተት', err.message);
+      Alert.alert(t('error'), err.message);
     }
   };
 
   const renderJobItem = ({ item }: { item: JobRequest }) => {
     return (
-      <View style={styles.jobCard}>
+      <View
+        style={[
+          styles.jobCard,
+          {
+            backgroundColor: colors.surfaceCard,
+            borderColor: colors.border
+          },
+          colors.cardShadow
+        ]}
+      >
         <View style={styles.cardHeader}>
           <View>
-            <Text style={styles.categoryText}>{item.category}</Text>
-            <Text style={styles.titleText}>{item.title || 'የስራ ጥያቄ'}</Text>
+            <Text style={[styles.categoryText, { color: colors.primary }]}>{item.category}</Text>
+            <Text style={[styles.titleText, { color: colors.textPrimary }]}>{item.title || t('job_request_default')}</Text>
           </View>
           <Badge
-            label={item.status}
+            label={getStatusLabel(item.status)}
             variant={
               item.status === 'COMPLETED'
                 ? 'success'
@@ -65,20 +87,20 @@ export default function WorkerJobsScreen() {
         {/* Customer Audio Description */}
         {item.audio_description_url && (
           <View style={{ marginVertical: 10 }}>
-            <VoicePlayer audioUrl={item.audio_description_url} title="የደንበኛው ድምጽ" />
+            <VoicePlayer audioUrl={item.audio_description_url} title={t('customer_voice')} />
           </View>
         )}
 
         {item.text_description && (
-          <Text style={styles.descText} numberOfLines={2}>
+          <Text style={[styles.descText, { color: colors.textSecondary }]} numberOfLines={2}>
             {item.text_description}
           </Text>
         )}
 
-        <View style={styles.clientRow}>
-          <Text style={styles.clientName}>{item.client_name || 'ደንበኛ'}</Text>
+        <View style={[styles.clientRow, { borderTopColor: colors.borderSubtle }]}>
+          <Text style={[styles.clientName, { color: colors.textPrimary }]}>{item.client_name || t('client')}</Text>
           {item.offered_price_etb && (
-            <Text style={styles.priceText}>{item.offered_price_etb} ETB</Text>
+            <Text style={[styles.priceText, { color: colors.primary }]}>{item.offered_price_etb} {t('etb')}</Text>
           )}
         </View>
 
@@ -99,14 +121,14 @@ export default function WorkerJobsScreen() {
                 variant="outline"
                 size="sm"
                 style={{ flex: 1 }}
-                icon={<X size={16} color="#0F766E" />}
+                icon={<X size={16} color={colors.primary} />}
               />
             </>
           )}
 
           {item.status === 'IN_PROGRESS' && (
             <Button
-              title="ስራውን አጠናቅቅ (Complete)"
+              title={t('complete')}
               onPress={() => handleUpdateStatus(item.id, 'COMPLETED')}
               size="sm"
               style={{ flex: 1 }}
@@ -115,7 +137,7 @@ export default function WorkerJobsScreen() {
           )}
 
           {item.status === 'COMPLETED' && (
-            <Text style={styles.completedLabel}>ይህ ስራ በተሳካ ሁኔታ ተጠናቋል ✓</Text>
+            <Text style={[styles.completedLabel, { color: colors.success }]}>{t('job_completed_done')} ✓</Text>
           )}
         </View>
       </View>
@@ -123,13 +145,13 @@ export default function WorkerJobsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>የተላኩልዎት የስራ ጥሪዎች</Text>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.surfaceCard, borderBottomColor: colors.border }]}>
+        <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>{t('incoming_requests')}</Text>
       </View>
 
       {isLoading ? (
-        <LoadingState message="ስራዎችን በመጫን ላይ..." />
+        <LoadingState message={t('loading_jobs')} />
       ) : (
         <FlatList
           data={jobs}
@@ -139,8 +161,8 @@ export default function WorkerJobsScreen() {
           refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
           ListEmptyComponent={
             <EmptyState
-              title="ምንም የተመዘገበ ስራ የለም"
-              description="አዲስ የስራ ጥሪ ሲደርስዎ እዚህ ይታያል"
+              title={t('no_registered_jobs')}
+              description={t('incoming_jobs_empty_desc')}
             />
           }
         />

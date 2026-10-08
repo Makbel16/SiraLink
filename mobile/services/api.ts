@@ -1,4 +1,4 @@
-import { Platform } from 'react-native';
+import { Platform, NativeModules } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import * as FileSystem from 'expo-file-system/legacy';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -15,22 +15,60 @@ import {
 
 const TOKEN_KEY = 'siralink_auth_token';
 
-// Determine API base URL based on platform and environment
-const getBaseUrl = (): string => {
+// Determine API base URL dynamically based on platform, bundle source, and environment
+export const getBaseUrl = (): string => {
   if (process.env.EXPO_PUBLIC_API_URL) {
     return process.env.EXPO_PUBLIC_API_URL.replace(/\/$/, '');
   }
-  // Auto-detect development server host from Expo Constants (works with both local Wi-Fi and Tunnel)
-  const hostUri = Constants.expoConfig?.hostUri;
-  if (hostUri) {
-    if (hostUri.includes('.exp.direct')) {
-      return `https://${hostUri}`;
+
+  // 1. Check NativeModules SourceCode scriptURL (where this JS bundle was downloaded from)
+  const scriptURL = (NativeModules as any)?.SourceCode?.scriptURL;
+  if (scriptURL && typeof scriptURL === 'string') {
+    try {
+      const match = scriptURL.match(/^(https?:\/\/[^/]+)/i);
+      if (match && match[1]) {
+        let origin = match[1];
+        if (origin.includes('.exp.direct') || origin.includes('ngrok')) {
+          origin = origin.replace(/^http:/, 'https:').replace(/:(80|8081)$/, '');
+        }
+        return origin;
+      }
+    } catch {}
+  }
+
+  // 2. Check Expo linkingUri or experienceUrl (e.g., exp://... or https://...)
+  const expUrl = Constants.linkingUri || (Constants as any).experienceUrl;
+  if (expUrl && typeof expUrl === 'string') {
+    try {
+      const cleaned = expUrl.replace(/^exp:\/\//i, '').replace(/\/.*$/, '');
+      if (cleaned) {
+        if (cleaned.includes('.exp.direct') || cleaned.includes('ngrok')) {
+          const hostOnly = cleaned.split(':')[0];
+          return `https://${hostOnly}`;
+        }
+        return `http://${cleaned}`;
+      }
+    } catch {}
+  }
+
+  // 3. Auto-detect development server host from Expo Constants
+  const hostUri =
+    Constants.expoConfig?.hostUri ||
+    (Constants as any).expoGoConfig?.debuggerHost ||
+    (Constants as any).manifest2?.extra?.expoGo?.debuggerHost ||
+    (Constants as any).manifest?.debuggerHost;
+
+  if (hostUri && typeof hostUri === 'string') {
+    if (hostUri.includes('.exp.direct') || hostUri.includes('ngrok')) {
+      const hostOnly = hostUri.split(':')[0];
+      return `https://${hostOnly}`;
     }
     return `http://${hostUri}`;
   }
-  // Android emulator fallback
+
+  // 4. Fallback for physical devices / hotspot connection
   if (Platform.OS === 'android') {
-    return 'http://10.0.2.2:3000';
+    return 'http://192.168.137.90:3000';
   }
   return 'http://localhost:3000';
 };
@@ -109,7 +147,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     headers['Content-Type'] = 'application/json';
   }
 
-  const url = `${BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+  const url = `${getBaseUrl()}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
 
   try {
     const res = await fetch(url, {
@@ -286,7 +324,7 @@ export const api = {
 
       // Strategy B: Native FileSystem.uploadAsync (streaming native multipart without JS FormData)
       const token = await tokenStorage.get();
-      const url = `${BASE_URL}/api/voice/transcribe`;
+      const url = `${getBaseUrl()}/api/voice/transcribe`;
 
       const uploadResult = await FileSystem.uploadAsync(url, fileUri, {
         fieldName: 'file',

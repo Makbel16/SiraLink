@@ -1,10 +1,11 @@
 import React, { useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Star, MapPin, ShieldCheck, Zap, ArrowRight, Check } from 'lucide-react-native';
+import { Star, MapPin, ShieldCheck, Zap, ArrowRight } from 'lucide-react-native';
 import { NearbyWorker } from '../types/index';
 import { Avatar } from './Avatar';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from '../utils/i18n';
 
 interface FeaturedWorkerCard3DProps {
   worker: NearbyWorker;
@@ -18,6 +19,7 @@ export function FeaturedWorkerCard3D({
   onPressDetails
 }: FeaturedWorkerCard3DProps) {
   const { colors, isDark } = useTheme();
+  const { t } = useTranslation();
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {
@@ -41,6 +43,10 @@ export function FeaturedWorkerCard3D({
   const gradientColors: [string, string] = isDark
     ? ['#162036', '#0F172A']
     : ['#FFFFFF', '#F0FDFA'];
+
+  const categoryLabel = worker.skill_category
+    ? t(`cat_${worker.skill_category.toLowerCase()}`, worker.skill_category)
+    : t('worker');
 
   return (
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
@@ -96,7 +102,7 @@ export function FeaturedWorkerCard3D({
                 >
                   <ShieldCheck size={12} color={colors.primary} />
                   <Text style={[styles.verifiedTagText, { color: colors.primary }]}>
-                    የታመነ
+                    {t('verified')}
                   </Text>
                 </View>
 
@@ -112,13 +118,13 @@ export function FeaturedWorkerCard3D({
                 style={[styles.workerName, { color: colors.textPrimary }]}
                 numberOfLines={1}
               >
-                {worker.full_name}
+                {worker.full_name || t('worker')}
               </Text>
               <Text
                 style={[styles.categorySubtitle, { color: colors.textSecondary }]}
                 numberOfLines={1}
               >
-                {worker.skill_category}
+                {categoryLabel}
               </Text>
             </View>
           </View>
@@ -128,15 +134,15 @@ export function FeaturedWorkerCard3D({
             <View style={styles.distanceBox}>
               <MapPin size={12} color={colors.textSecondary} />
               <Text style={[styles.distanceText, { color: colors.textSecondary }]}>
-                {worker.distance_km} km ርቀት
+                {worker.distance_km || 1.2} {t('km')} {t('away')}
               </Text>
             </View>
 
             <View style={styles.rateBox}>
               <Text style={[styles.rateValue, { color: colors.primary }]}>
-                {worker.hourly_rate_etb || 450} ETB
+                {worker.hourly_rate_etb || 450} {t('etb')}
               </Text>
-              <Text style={[styles.rateUnit, { color: colors.textMuted }]}>/ሰዓት</Text>
+              <Text style={[styles.rateUnit, { color: colors.textMuted }]}>{t('per_hour')}</Text>
             </View>
           </View>
 
@@ -150,7 +156,7 @@ export function FeaturedWorkerCard3D({
             onPress={() => onRequest(worker)}
           >
             <Zap size={14} color="#FFFFFF" />
-            <Text style={styles.actionButtonText}>አሁን ጥሩ (Request)</Text>
+            <Text style={styles.actionButtonText}>{t('request_now')}</Text>
             <ArrowRight size={13} color="#FFFFFF" />
           </TouchableOpacity>
         </LinearGradient>
@@ -161,44 +167,40 @@ export function FeaturedWorkerCard3D({
 
 const styles = StyleSheet.create({
   container: {
-    width: 250,
-    height: 185,
+    width: 260,
     borderRadius: 22,
     borderWidth: 1.5,
     overflow: 'hidden'
   },
   gradient: {
-    flex: 1,
-    padding: 14,
-    justifyContent: 'space-between'
+    padding: 16
   },
   topRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12
+    gap: 12,
+    alignItems: 'flex-start'
   },
   avatarWrap: {
     position: 'relative'
   },
   onlineBadge: {
     position: 'absolute',
-    bottom: 0,
-    right: 0,
-    width: 13,
-    height: 13,
-    borderRadius: 7,
+    bottom: 2,
+    right: 2,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
     borderWidth: 2,
     borderColor: '#FFFFFF'
   },
   topRightInfo: {
-    flex: 1,
-    gap: 2
+    flex: 1
   },
   badgeRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 2
+    marginBottom: 4
   },
   verifiedTag: {
     flexDirection: 'row',
@@ -218,7 +220,7 @@ const styles = StyleSheet.create({
     gap: 3
   },
   ratingText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '800'
   },
   workerName: {
@@ -228,13 +230,17 @@ const styles = StyleSheet.create({
   },
   categorySubtitle: {
     fontSize: 12,
-    fontWeight: '600'
+    fontWeight: '600',
+    marginTop: 1
   },
   middleRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 4
+    marginTop: 14,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0, 0, 0, 0.05)'
   },
   distanceBox: {
     flexDirection: 'row',
@@ -242,7 +248,7 @@ const styles = StyleSheet.create({
     gap: 4
   },
   distanceText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600'
   },
   rateBox: {
@@ -251,24 +257,21 @@ const styles = StyleSheet.create({
     gap: 2
   },
   rateValue: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '900'
   },
   rateUnit: {
-    fontSize: 11
+    fontSize: 10,
+    fontWeight: '600'
   },
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
-    paddingVertical: 9,
-    borderRadius: 14,
-    shadowColor: '#0D9488',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 3
+    paddingVertical: 10,
+    borderRadius: 12,
+    marginTop: 12
   },
   actionButtonText: {
     color: '#FFFFFF',

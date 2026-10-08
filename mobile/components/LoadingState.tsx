@@ -1,14 +1,21 @@
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import { useTranslation } from '../utils/i18n';
+import { useTheme } from '../context/ThemeContext';
 
 interface LoadingStateProps {
   message?: string;
 }
 
-export function LoadingState({ message = 'እባክዎ ይጠብቁ...' }: LoadingStateProps) {
+export function LoadingState({ message }: LoadingStateProps) {
+  const { t } = useTranslation();
+  const { colors } = useTheme();
+
   return (
     <View style={styles.container}>
-      <ActivityIndicator size="large" color="#0F766E" />
-      <Text style={styles.text}>{message}</Text>
+      <ActivityIndicator size="large" color={colors.primary} />
+      <Text style={[styles.text, { color: colors.textSecondary }]}>
+        {message || t('loading')}
+      </Text>
     </View>
   );
 }
@@ -22,7 +29,6 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 15,
-    color: '#64748B',
     fontWeight: '500'
   }
 });

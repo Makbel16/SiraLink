@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Users, ArrowUpRight } from 'lucide-react-native';
 import { JobCategory } from '../types/index';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from '../utils/i18n';
 
 export interface CategoryItemData {
   key?: JobCategory;
@@ -11,8 +12,9 @@ export interface CategoryItemData {
   enLabel: string;
   emoji: string;
   workerCount: number;
-  startingPrice: string;
+  startingPrice: number | string;
   tag?: string;
+  tagKey?: string;
   gradient: [string, string];
   darkGradient: [string, string];
 }
@@ -25,6 +27,7 @@ interface CategoryCard3DProps {
 
 export function CategoryCard3D({ item, isSelected, onPress }: CategoryCard3DProps) {
   const { colors, isDark } = useTheme();
+  const { t, language } = useTranslation();
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {
@@ -46,6 +49,21 @@ export function CategoryCard3D({ item, isSelected, onPress }: CategoryCard3DProp
   };
 
   const activeGradient = isDark ? item.darkGradient : item.gradient;
+
+  // Fully dynamic localized text based on the active language
+  const displayTitle = item.key
+    ? t(`cat_${item.key.toLowerCase()}`, language === 'en' ? item.enLabel : item.label)
+    : t('all_services');
+
+  const displayTag = item.tagKey
+    ? t(item.tagKey, item.tag)
+    : item.tag;
+
+  const displayWorkers = `${item.workerCount}+ ${t('pros_suffix')}`;
+
+  const displayPrice = typeof item.startingPrice === 'number'
+    ? `${t('from_price')} ${item.startingPrice} ${t('etb')}`
+    : item.startingPrice;
 
   return (
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
@@ -74,7 +92,7 @@ export function CategoryCard3D({ item, isSelected, onPress }: CategoryCard3DProp
         >
           {/* Top Tag */}
           <View style={styles.topRow}>
-            {item.tag ? (
+            {displayTag ? (
               <View
                 style={[
                   styles.tagPill,
@@ -91,7 +109,7 @@ export function CategoryCard3D({ item, isSelected, onPress }: CategoryCard3DProp
                     { color: isDark ? '#FCD34D' : '#D97706' }
                   ]}
                 >
-                  {item.tag}
+                  {displayTag}
                 </Text>
               </View>
             ) : null}
@@ -114,7 +132,7 @@ export function CategoryCard3D({ item, isSelected, onPress }: CategoryCard3DProp
             </View>
           </View>
 
-          {/* Titles */}
+          {/* Titles - Pure single language based on active selection */}
           <View style={styles.titleSection}>
             <Text
               style={[
@@ -123,16 +141,7 @@ export function CategoryCard3D({ item, isSelected, onPress }: CategoryCard3DProp
               ]}
               numberOfLines={1}
             >
-              {item.label}
-            </Text>
-            <Text
-              style={[
-                styles.categoryEnTitle,
-                { color: colors.textSecondary }
-              ]}
-              numberOfLines={1}
-            >
-              {item.enLabel}
+              {displayTitle}
             </Text>
           </View>
 
@@ -155,7 +164,7 @@ export function CategoryCard3D({ item, isSelected, onPress }: CategoryCard3DProp
                   { color: colors.textSecondary }
                 ]}
               >
-                {item.workerCount}+ ባለሙያ
+                {displayWorkers}
               </Text>
             </View>
 
@@ -166,7 +175,7 @@ export function CategoryCard3D({ item, isSelected, onPress }: CategoryCard3DProp
                   { color: colors.primary }
                 ]}
               >
-                {item.startingPrice}
+                {displayPrice}
               </Text>
               <ArrowUpRight size={11} color={colors.primary} />
             </View>
@@ -206,7 +215,7 @@ const styles = StyleSheet.create({
   topRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     minHeight: 22
   },
   tagPill: {
@@ -242,19 +251,13 @@ const styles = StyleSheet.create({
   },
   titleSection: {
     alignItems: 'center',
-    marginVertical: 2
+    marginVertical: 4
   },
   categoryTitle: {
-    fontSize: 14,
-    fontWeight: '800',
+    fontSize: 15,
+    fontWeight: '900',
     textAlign: 'center',
     letterSpacing: -0.2
-  },
-  categoryEnTitle: {
-    fontSize: 11,
-    fontWeight: '600',
-    textAlign: 'center',
-    marginTop: 1
   },
   cardFooter: {
     flexDirection: 'row',
@@ -266,11 +269,11 @@ const styles = StyleSheet.create({
   workerCountRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 3
+    gap: 4
   },
   workerCountText: {
     fontSize: 10,
-    fontWeight: '600'
+    fontWeight: '700'
   },
   priceRow: {
     flexDirection: 'row',

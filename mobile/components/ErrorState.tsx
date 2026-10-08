@@ -1,6 +1,8 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { AlertCircle } from 'lucide-react-native';
 import { Button } from './Button';
+import { useTranslation } from '../utils/i18n';
+import { useTheme } from '../context/ThemeContext';
 
 interface ErrorStateProps {
   message: string;
@@ -8,16 +10,19 @@ interface ErrorStateProps {
   retryText?: string;
 }
 
-export function ErrorState({ message, onRetry, retryText = 'እንደገና ሞክር' }: ErrorStateProps) {
+export function ErrorState({ message, onRetry, retryText }: ErrorStateProps) {
+  const { t } = useTranslation();
+  const { colors } = useTheme();
+
   return (
     <View style={styles.container}>
-      <View style={styles.iconCircle}>
-        <AlertCircle size={32} color="#DC2626" />
+      <View style={[styles.iconCircle, { backgroundColor: colors.dangerLight }]}>
+        <AlertCircle size={32} color={colors.danger} />
       </View>
-      <Text style={styles.message}>{message}</Text>
+      <Text style={[styles.message, { color: colors.textSecondary }]}>{message}</Text>
       {onRetry && (
         <Button
-          title={retryText}
+          title={retryText || t('retry')}
           onPress={onRetry}
           variant="outline"
           size="sm"
@@ -39,13 +44,11 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#FEE2E2',
     alignItems: 'center',
     justifyContent: 'center'
   },
   message: {
     fontSize: 15,
-    color: '#475569',
     textAlign: 'center',
     fontWeight: '500'
   }

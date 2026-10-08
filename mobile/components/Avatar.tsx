@@ -10,7 +10,7 @@ interface AvatarProps {
 
 export function Avatar({ name, imageUrl, size = 52, isVerified = false }: AvatarProps) {
   const getInitials = (n?: string | null): string => {
-    if (!n) return 'ስ';
+    if (!n) return 'S';
     const parts = n.trim().split(' ');
     if (parts.length >= 2 && parts[0] && parts[1]) {
       return `${parts[0].charAt(0)}${parts[1].charAt(0)}`.toUpperCase();

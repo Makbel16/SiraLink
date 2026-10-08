@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
 import { useTranslation } from '../../utils/i18n';
+import { useTheme } from '../../context/ThemeContext';
 import { Button } from '../../components/Button';
 import { VoiceRecorder } from '../../components/VoiceRecorder';
 import { JobCategory, TranscriptionResult } from '../../types/index';
@@ -12,6 +13,7 @@ export default function WorkerProfileEditScreen() {
   const router = useRouter();
   const { workerProfile, refreshUser } = useAuth();
   const { t } = useTranslation();
+  const { colors, isDark } = useTheme();
 
   const [category, setCategory] = useState<JobCategory>(workerProfile?.skill_category || 'PLUMBING');
   const [rate, setRate] = useState<string>(workerProfile?.hourly_rate_etb?.toString() || '450');
@@ -33,12 +35,27 @@ export default function WorkerProfileEditScreen() {
     'OTHER'
   ];
 
+  const getCategoryName = (cat: JobCategory) => {
+    switch (cat) {
+      case 'PLUMBING': return t('cat_plumbing');
+      case 'ELECTRICAL': return t('cat_electrical');
+      case 'CARPENTRY': return t('cat_carpentry');
+      case 'PAINTING': return t('cat_painting');
+      case 'CLEANING': return t('cat_cleaning');
+      case 'MECHANIC': return t('cat_mechanic');
+      case 'CONSTRUCTION': return t('cat_construction');
+      case 'MOVING': return t('cat_moving');
+      case 'GARDENING': return t('cat_gardening');
+      default: return t('cat_other');
+    }
+  };
+
   const handleVoiceComplete = (result: TranscriptionResult) => {
     setVoiceUrl(result.audioUrl);
     if (!description) {
       setDescription(result.transcript);
     }
-    Alert.alert('ድምጽ ተቀድቷል', 'የድምጽ መግለጫዎ በተሳካ ሁኔታ ተጭኗል!');
+    Alert.alert(t('voice_intro_label'), t('voice_recorded_success'));
   };
 
   const handleSave = async () => {
@@ -52,22 +69,22 @@ export default function WorkerProfileEditScreen() {
       });
 
       await refreshUser();
-      Alert.alert('ተሳክቷል!', 'የባለሙያ መገለጫዎ በተሳካ ሁኔታ ተስተካክሏል!', [
-        { text: 'እሺ', onPress: () => router.back() }
+      Alert.alert(t('profile_saved_success'), '', [
+        { text: t('continue'), onPress: () => router.back() }
       ]);
     } catch (err: any) {
-      Alert.alert('ስህተት', err.message || t('something_went_wrong'));
+      Alert.alert(t('error'), err.message || t('something_went_wrong'));
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         {/* Category selection */}
         <View style={styles.section}>
-          <Text style={styles.label}>ዋና የሙያ ዘርፍ (Primary Skill)</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>{t('primary_skill')}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.catScroll}>
             {categories.map((cat) => {
               const isSelected = category === cat;
@@ -75,10 +92,28 @@ export default function WorkerProfileEditScreen() {
                 <TouchableOpacity
                   key={cat}
                   onPress={() => setCategory(cat)}
-                  style={[styles.catPill, isSelected && styles.catPillActive]}
+                  style={[
+                    styles.catPill,
+                    {
+                      backgroundColor: isSelected
+                        ? colors.primary
+                        : isDark
+                        ? colors.surfaceSubtle
+                        : '#F1F5F9',
+                      borderColor: isSelected ? colors.primary : colors.border
+                    }
+                  ]}
                 >
-                  <Text style={[styles.catText, isSelected && styles.catTextActive]}>
-                    {cat}
+                  <Text
+                    style={[
+                      styles.catText,
+                      {
+                        color: isSelected ? '#FFFFFF' : colors.textSecondary,
+                        fontWeight: isSelected ? '800' : '600'
+                      }
+                    ]}
+                  >
+                    {getCategoryName(cat)}
                   </Text>
                 </TouchableOpacity>
               );
@@ -88,13 +123,22 @@ export default function WorkerProfileEditScreen() {
 
         {/* Hourly Rate */}
         <View style={styles.section}>
-          <Text style={styles.label}>የሰዓት ተመን በብር (Hourly Rate in ETB)</Text>
-          <View style={styles.inputPrefixRow}>
-            <Text style={styles.prefixText}>ETB</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>{t('hourly_rate_etb')}</Text>
+          <View
+            style={[
+              styles.inputPrefixRow,
+              {
+                backgroundColor: isDark ? colors.surfaceSubtle : '#FFFFFF',
+                borderColor: colors.border
+              }
+            ]}
+          >
+            <Text style={[styles.prefixText, { color: colors.primary }]}>{t('etb')}</Text>
             <TextInput
-              style={styles.textInput}
+              style={[styles.textInput, { color: colors.textPrimary }]}
               keyboardType="numeric"
               placeholder="450"
+              placeholderTextColor={colors.textMuted}
               value={rate}
               onChangeText={setRate}
             />
@@ -103,11 +147,19 @@ export default function WorkerProfileEditScreen() {
 
         {/* Experience years */}
         <View style={styles.section}>
-          <Text style={styles.label}>የስራ ልምድ በዓመታት (Years of Experience)</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>{t('experience_years_label')}</Text>
           <TextInput
-            style={styles.textInputFull}
+            style={[
+              styles.textInputFull,
+              {
+                backgroundColor: isDark ? colors.surfaceSubtle : '#FFFFFF',
+                borderColor: colors.border,
+                color: colors.textPrimary
+              }
+            ]}
             keyboardType="numeric"
             placeholder="5"
+            placeholderTextColor={colors.textMuted}
             value={experience}
             onChangeText={setExperience}
           />
@@ -115,12 +167,21 @@ export default function WorkerProfileEditScreen() {
 
         {/* Skill Description */}
         <View style={styles.section}>
-          <Text style={styles.label}>ስለ እርስዎ እና ስራዎ ማብራሪያ (Bio)</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>{t('bio_label')}</Text>
           <TextInput
-            style={[styles.textInputFull, styles.textArea]}
+            style={[
+              styles.textInputFull,
+              styles.textArea,
+              {
+                backgroundColor: isDark ? colors.surfaceSubtle : '#FFFFFF',
+                borderColor: colors.border,
+                color: colors.textPrimary
+              }
+            ]}
             multiline
             numberOfLines={4}
-            placeholder="ስለሚሰሩት ስራ፣ ስለ ችሎታዎ እና ስለ መሳሪያዎችዎ ይግለጹ..."
+            placeholder={t('bio_placeholder')}
+            placeholderTextColor={colors.textMuted}
             value={description}
             onChangeText={setDescription}
           />
@@ -128,16 +189,16 @@ export default function WorkerProfileEditScreen() {
 
         {/* Voice Bio Recorder */}
         <View style={styles.section}>
-          <Text style={styles.label}>የድምጽ መግለጫ ይቅረጹ (Voice Introduction)</Text>
-          <Text style={styles.helperText}>
-            ደንበኞች ድምጽዎን በማዳመጥ እምነት እንዲጥሉብዎት ስለ ራስዎ በአጭሩ ይናገሩ
+          <Text style={[styles.label, { color: colors.textSecondary }]}>{t('voice_intro_label')}</Text>
+          <Text style={[styles.helperText, { color: colors.textMuted }]}>
+            {t('voice_intro_hint')}
           </Text>
           <VoiceRecorder onTranscriptionComplete={handleVoiceComplete} />
         </View>
 
         {/* Save button */}
         <Button
-          title="አስቀምጥ (Save Profile)"
+          title={t('save_profile')}
           onPress={handleSave}
           loading={submitting}
           size="lg"

@@ -129,9 +129,9 @@ export function WorkerCard({ worker, onRequest, onPressDetails }: WorkerCardProp
 
         <View style={styles.rateBox}>
           <Text style={[styles.rateAmount, { color: colors.primary }]}>
-            {worker.hourly_rate_etb || 400} ETB
+            {worker.hourly_rate_etb || 400} {t('etb')}
           </Text>
-          <Text style={[styles.rateUnit, { color: colors.textSecondary }]}>/{t('rate').toLowerCase()}</Text>
+          <Text style={[styles.rateUnit, { color: colors.textSecondary }]}>/{t('per_hour')}</Text>
         </View>
 
         <Button

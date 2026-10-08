@@ -2,13 +2,16 @@ import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Platform }
 import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-audio';
 import { Play, Pause, Volume2 } from 'lucide-react-native';
 import { api } from '../services/api';
+import { useTranslation } from '../utils/i18n';
 
 interface VoicePlayerProps {
   audioUrl: string;
   title?: string;
 }
 
-export function VoicePlayer({ audioUrl, title = 'የድምጽ መልዕክት' }: VoicePlayerProps) {
+export function VoicePlayer({ audioUrl, title }: VoicePlayerProps) {
+  const { t } = useTranslation();
+  const displayTitle = title || t('voice_note_title');
   const resolvedUrl = api.resolveMediaUrl(audioUrl);
   const player = useAudioPlayer(resolvedUrl ? { uri: resolvedUrl } : null, {
     downloadFirst: true,
@@ -76,7 +79,7 @@ export function VoicePlayer({ audioUrl, title = 'የድምጽ መልዕክት' }
         <View style={styles.headerRow}>
           <View style={styles.titleRow}>
             <Volume2 size={14} color="#0F766E" />
-            <Text style={styles.titleText}>{title}</Text>
+            <Text style={styles.titleText}>{displayTitle}</Text>
           </View>
           <Text style={styles.timeText}>
             {formatTime(currentTimeSec)} / {formatTime(durationSec)}

@@ -18,7 +18,7 @@ export default function VerifyOtpScreen() {
 
   const handleVerify = async () => {
     if (!otpCode || otpCode.length < 4) {
-      Alert.alert('ስህተት', 'እባክዎ የማረጋገጫ ኮዱን ያስገቡ');
+      Alert.alert(t('error'), t('enter_otp_err'));
       return;
     }
 
@@ -37,7 +37,7 @@ export default function VerifyOtpScreen() {
         router.replace('/(tabs)');
       }
     } catch (err: any) {
-      Alert.alert('የማረጋገጫ ስህተት', err.message || t('something_went_wrong'));
+      Alert.alert(t('verification_err'), err.message || t('something_went_wrong'));
     } finally {
       setLoading(false);
     }
@@ -51,7 +51,7 @@ export default function VerifyOtpScreen() {
         </View>
         <Text style={styles.title}>{t('otp')}</Text>
         <Text style={styles.subtitle}>
-          {params.phoneNumber} ላይ የተላከውን ባለ 6 አሃዝ ኮድ ያስገቡ
+          {t('enter_otp_sub')} {params.phoneNumber}
         </Text>
       </View>
 
@@ -70,20 +70,20 @@ export default function VerifyOtpScreen() {
         {params.devOtp && (
           <View style={styles.devHint}>
             <Text style={styles.devHintText}>
-              ⚙️ የልማት ሁነታ (Dev Mode): የሙከራ ኮድዎ {params.devOtp} ነው
+              ⚙️ {t('dev_mode_hint')} {params.devOtp}
             </Text>
           </View>
         )}
 
         {/* Full Name input */}
-        <Text style={[styles.inputLabel, { marginTop: 20 }]}>{t('full_name')} (አማራጭ)</Text>
+        <Text style={[styles.inputLabel, { marginTop: 20 }]}>{t('full_name')} ({t('optional')})</Text>
         <View style={styles.nameInputRow}>
           <User size={18} color="#64748B" />
           <TextInput
             style={styles.nameInput}
             value={fullName}
             onChangeText={setFullName}
-            placeholder="ለምሳሌ፡ ዮሐንስ አበበ"
+            placeholder={t('full_name_placeholder')}
             placeholderTextColor="#94A3B8"
           />
         </View>

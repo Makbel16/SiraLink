@@ -18,7 +18,7 @@ export default function LoginScreen() {
 
   const handleSendOTP = async () => {
     if (!phoneNumber || phoneNumber.trim().length < 9) {
-      Alert.alert('ስህተት', 'እባክዎ ትክክለኛ ስልክ ቁጥር ያስገቡ');
+      Alert.alert(t('error'), t('enter_valid_phone'));
       return;
     }
 
@@ -35,7 +35,7 @@ export default function LoginScreen() {
         }
       });
     } catch (err: any) {
-      Alert.alert('ስህተት', err.message || t('something_went_wrong'));
+      Alert.alert(t('error'), err.message || t('something_went_wrong'));
     } finally {
       setLoading(false);
     }
@@ -46,7 +46,7 @@ export default function LoginScreen() {
       <View style={styles.header}>
         <Text style={styles.title}>{t('login')}</Text>
         <Text style={styles.subtitle}>
-          ስልክ ቁጥርዎን ያስገቡ፤ የማረጋገጫ ኮድ (OTP) እንልክልዎታለን
+          {t('login_subtitle')}
         </Text>
       </View>
 
@@ -97,7 +97,7 @@ export default function LoginScreen() {
         <View style={styles.securityHint}>
           <Shield size={14} color="#64748B" />
           <Text style={styles.securityHintText}>
-            ስልክዎ ለደህንነት እና አገልግሎት ብቻ የሚውል ነው
+            {t('phone_security_hint')}
           </Text>
         </View>
       </View>

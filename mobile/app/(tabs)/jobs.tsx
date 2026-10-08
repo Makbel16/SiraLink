@@ -39,7 +39,7 @@ type FilterType = 'ALL' | 'ACTIVE' | 'COMPLETED';
 interface StatusCardData {
   id: FilterType;
   label: string;
-  enLabel: string;
+  subLabel: string;
   emoji: string;
   countKey: 'all' | 'active' | 'completed';
   tag: string;
@@ -152,7 +152,7 @@ function StatusCard3D({ item, count, isSelected, onPress }: StatusCard3DProps) {
             </View>
           </View>
 
-          {/* Title & English Subtitle */}
+          {/* Localized Title & Subtitle */}
           <View style={styles.cardTitles}>
             <Text
               style={[styles.mainCardTitle, { color: colors.textPrimary }]}
@@ -164,7 +164,7 @@ function StatusCard3D({ item, count, isSelected, onPress }: StatusCard3DProps) {
               style={[styles.subCardTitle, { color: colors.textSecondary }]}
               numberOfLines={1}
             >
-              {item.enLabel}
+              {item.subLabel}
             </Text>
           </View>
 
@@ -255,40 +255,40 @@ export default function JobsTabScreen() {
     return true;
   });
 
-  // Status Cards tailored exactly as requested: (all(ሁሉም), pending(በመስራት ላይ) and completed(የተጠናቀቀ))
+  // Status Cards tailored dynamically by language
   const statusCardsData: StatusCardData[] = [
     {
       id: 'ALL',
-      label: 'ሁሉም',
-      enLabel: 'All Jobs',
+      label: t('all_filter'),
+      subLabel: t('all_requests'),
       emoji: '📋',
       countKey: 'all',
-      tag: '⭐ ሁሉም ስራዎች',
-      footerLabel: 'ጠቅላላ',
+      tag: `⭐ ${t('tag_all')}`,
+      footerLabel: t('total_jobs'),
       accentColor: colors.primary,
       gradient: ['#F0FDFA', '#CCFBF1'],
       darkGradient: ['#16253B', '#0F1826']
     },
     {
       id: 'ACTIVE',
-      label: 'በመስራት ላይ',
-      enLabel: 'Pending & Active',
+      label: t('pending_filter'),
+      subLabel: t('pending_and_active'),
       emoji: '⚡',
       countKey: 'active',
-      tag: '🔥 በመስራት ላይ',
-      footerLabel: 'በሂደት ላይ',
+      tag: `🔥 ${t('tag_pending')}`,
+      footerLabel: t('tag_pending'),
       accentColor: '#D97706',
       gradient: ['#FFFBEB', '#FEF3C7'],
       darkGradient: ['#2E1E05', '#1B1102']
     },
     {
       id: 'COMPLETED',
-      label: 'የተጠናቀቀ',
-      enLabel: 'Completed',
+      label: t('completed_filter'),
+      subLabel: t('completed_and_done'),
       emoji: '🏆',
       countKey: 'completed',
-      tag: '🎉 የተጠናቀቁ',
-      footerLabel: 'የተሳኩ',
+      tag: `🎉 ${t('tag_completed')}`,
+      footerLabel: t('completed_filter'),
       accentColor: '#059669',
       gradient: ['#F0FDF4', '#DCFCE7'],
       darkGradient: ['#0A2917', '#05180D']
@@ -335,7 +335,7 @@ export default function JobsTabScreen() {
               <View>
                 <View style={styles.titleWithBadge}>
                   <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>
-                    የኔ ስራዎች
+                    {t('my_jobs')}
                   </Text>
                   {/* Live Status Indicator Pill */}
                   <View
@@ -352,19 +352,19 @@ export default function JobsTabScreen() {
                       style={[styles.pulsingDot, { backgroundColor: colors.primary }]}
                     />
                     <Text style={[styles.liveIndicatorText, { color: colors.primary }]}>
-                      {jobs.length} ስራዎች
+                      {jobs.length} {t('jobs')}
                     </Text>
                   </View>
                 </View>
 
                 <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-                  My Jobs • የተመዘገቡ የስራ ትዕዛዞች ክትትል
+                  {t('my_jobs_subtitle')}
                 </Text>
               </View>
             </View>
           </View>
 
-          {/* "+ አዲስ ስራ (Post Job)" Gradient Action Button */}
+          {/* "+ New Job" Gradient Action Button */}
           <TouchableOpacity
             activeOpacity={0.85}
             onPress={() => router.push('/job/create')}
@@ -377,7 +377,7 @@ export default function JobsTabScreen() {
               style={styles.newJobGradient}
             >
               <Plus size={16} color="#FFFFFF" strokeWidth={2.5} />
-              <Text style={styles.newJobText}>አዲስ ስራ</Text>
+              <Text style={styles.newJobText}>{t('post_job')}</Text>
             </LinearGradient>
           </TouchableOpacity>
         </View>
@@ -406,7 +406,7 @@ export default function JobsTabScreen() {
           >
             <Text style={styles.metricEmoji}>📋</Text>
             <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>
-              ሁሉም:
+              {t('all_filter')}:
             </Text>
             <Text style={[styles.metricValue, { color: colors.textPrimary }]}>
               {jobs.length}
@@ -427,7 +427,7 @@ export default function JobsTabScreen() {
           >
             <Text style={styles.metricEmoji}>⚡</Text>
             <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>
-              በመስራት ላይ:
+              {t('pending_filter')}:
             </Text>
             <Text
               style={[
@@ -453,7 +453,7 @@ export default function JobsTabScreen() {
           >
             <Text style={styles.metricEmoji}>🏆</Text>
             <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>
-              የተጠናቀቀ:
+              {t('completed_filter')}:
             </Text>
             <Text
               style={[
@@ -481,7 +481,7 @@ export default function JobsTabScreen() {
                 <View style={styles.sectionHeadingGroup}>
                   <Layers size={18} color={colors.primary} />
                   <Text style={[styles.sectionHeading, { color: colors.textPrimary }]}>
-                    የስራዎች ሁኔታ ማጣሪያ (Status Filter)
+                    {t('jobs_status_filter')}
                   </Text>
                 </View>
 
@@ -493,16 +493,16 @@ export default function JobsTabScreen() {
                 >
                   <ListFilter size={12} color={colors.textSecondary} />
                   <Text style={[styles.filterBadgeText, { color: colors.textSecondary }]}>
-                    3 ካርዶች
+                    {t('status_cards_count')}
                   </Text>
                 </View>
               </View>
               <Text style={[styles.sectionSubHeading, { color: colors.textSecondary }]}>
-                ለማጣራት ካርዶቹን ይጫኑ • Tap card to filter jobs
+                {t('tap_card_to_filter')}
               </Text>
             </View>
 
-            {/* Horizontal 3D Status Cards Carousel (Identical to Category List Card Style) */}
+            {/* Horizontal 3D Status Cards Carousel */}
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -549,10 +549,10 @@ export default function JobsTabScreen() {
                 />
                 <Text style={[styles.activeFilterTitle, { color: colors.textPrimary }]}>
                   {filter === 'ALL'
-                    ? 'ሁሉም የተመዘገቡ ስራዎች'
+                    ? t('all_registered_jobs')
                     : filter === 'ACTIVE'
-                    ? 'በመስራት ላይ ያሉ ስራዎች'
-                    : 'የተጠናቀቁ ስራዎች'}
+                    ? t('active_jobs_title')
+                    : t('completed_jobs_title')}
                 </Text>
               </View>
 
@@ -567,7 +567,7 @@ export default function JobsTabScreen() {
                 ]}
               >
                 <Text style={[styles.activeFilterCount, { color: colors.primary }]}>
-                  {filteredJobs.length} ስራዎች ተገኝተዋል
+                  {filteredJobs.length} {t('jobs_found')}
                 </Text>
               </View>
             </View>
@@ -598,18 +598,18 @@ export default function JobsTabScreen() {
 
               <Text style={[styles.emptyCardTitle, { color: colors.textPrimary }]}>
                 {filter === 'ACTIVE'
-                  ? 'በአሁኑ ጊዜ በመስራት ላይ ያለ ስራ የለም'
+                  ? t('no_jobs_active')
                   : filter === 'COMPLETED'
-                  ? 'የተጠናቀቀ ስራ እስካሁን የለም'
-                  : 'ምንም የተመዘገበ ስራ የለም'}
+                  ? t('no_jobs_completed')
+                  : t('no_jobs_all')}
               </Text>
 
               <Text style={[styles.emptyCardSub, { color: colors.textSecondary }]}>
                 {filter === 'ACTIVE'
-                  ? 'አዲስ ስራ ሲጠይቁ ወይም ባለሙያ ሲጀምር በዚህ ዝርዝር ውስጥ ይታያል።'
+                  ? t('no_jobs_active_sub')
                   : filter === 'COMPLETED'
-                  ? 'ያለቁ እና የተጠናቀቁ ስራዎች በዚህ ክፍል ውስጥ ይቀመጣሉ።'
-                  : 'አዲስ የስራ ጥያቄ ለመመዝገብ ከታች ያለውን "አዲስ ስራ ጠይቅ" የሚለውን ይጫኑ ወይም በድምጽ ይቅረጹ።'}
+                  ? t('no_jobs_completed_sub')
+                  : t('no_jobs_all_sub')}
               </Text>
 
               <TouchableOpacity
@@ -618,7 +618,7 @@ export default function JobsTabScreen() {
                 onPress={() => router.push('/job/create')}
               >
                 <Plus size={16} color="#FFFFFF" strokeWidth={2.5} />
-                <Text style={styles.emptyActionBtnText}>አዲስ ስራ ጠይቅ (Post Job)</Text>
+                <Text style={styles.emptyActionBtnText}>{t('post_job')}</Text>
               </TouchableOpacity>
             </View>
           )

@@ -31,8 +31,8 @@ export default function WorkerDashboardScreen() {
     try {
       await api.updateWorkerAvailability(value);
       Alert.alert(
-        value ? 'ክፍት ነዎት' : 'ስራ ላይ ነዎት',
-        value ? 'አሁን አዳዲስ የስራ ጥሪዎችን ይቀበላሉ' : 'የስራ ጥሪዎች ለጊዜው አይደርስዎትም'
+        value ? t('online_status') : t('offline_status'),
+        value ? t('online_hint') : t('offline_hint')
       );
       queryClient.invalidateQueries({ queryKey: ['worker-jobs'] });
     } catch {
@@ -79,13 +79,13 @@ export default function WorkerDashboardScreen() {
                   { color: isAvailable ? (isDark ? '#4ADE80' : '#15803D') : colors.textPrimary }
                 ]}
               >
-                {isAvailable ? 'አሁን ክፍት ነዎት (Online)' : 'ስራ ላይ ነዎት (Busy / Offline)'}
+                {isAvailable ? t('online_status') : t('offline_status')}
               </Text>
             </View>
             <Text style={[styles.availabilitySub, { color: colors.textSecondary }]}>
               {isAvailable
-                ? 'ደንበኞች በአቅራቢያዎ ስራ ሲጠይቁ ማሳወቂያ ይደርስዎታል'
-                : 'አዳዲስ ስራዎችን መቀበል ሲፈልጉ ያብሩት'}
+                ? t('online_hint')
+                : t('offline_hint')}
             </Text>
           </View>
           <Switch
@@ -111,7 +111,7 @@ export default function WorkerDashboardScreen() {
             <Text style={[styles.statNumber, { color: colors.accent }]}>
               {incomingRequests.length}
             </Text>
-            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>አዳዲስ ጥሪዎች</Text>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{t('new_calls')}</Text>
           </View>
 
           <View style={[styles.statDivider, { backgroundColor: colors.borderSubtle }]} />
@@ -120,7 +120,7 @@ export default function WorkerDashboardScreen() {
             <Text style={[styles.statNumber, { color: colors.primary }]}>
               {activeJobs.length}
             </Text>
-            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>በመሰራት ላይ</Text>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{t('tag_pending')}</Text>
           </View>
 
           <View style={[styles.statDivider, { backgroundColor: colors.borderSubtle }]} />
@@ -129,18 +129,18 @@ export default function WorkerDashboardScreen() {
             <Text style={[styles.statNumber, { color: colors.success }]}>
               {workerJobs.filter((j) => j.status === 'COMPLETED').length}
             </Text>
-            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>የተጠናቀቁ</Text>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{t('tag_completed')}</Text>
           </View>
         </View>
 
         {/* Incoming Job Alerts */}
         <View style={styles.sectionHeader}>
           <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
-            አዳዲስ የስራ ጥሪዎች (Incoming Requests)
+            {t('incoming_requests')}
           </Text>
           <TouchableOpacity onPress={() => router.push('/worker/jobs')}>
             <Text style={[styles.seeAllText, { color: colors.primary }]}>
-              ሁሉንም ({incomingRequests.length})
+              {t('all_filter')} ({incomingRequests.length})
             </Text>
           </TouchableOpacity>
         </View>
@@ -166,7 +166,7 @@ export default function WorkerDashboardScreen() {
           >
             <CheckCircle2 size={24} color={colors.primary} />
             <Text style={[styles.emptyRequestsText, { color: colors.textSecondary }]}>
-              በአሁኑ ጊዜ አዲስ የስራ ጥሪ የለም። መተግበሪያውን ክፍት ያድርጉት።
+              {t('incoming_jobs_empty_desc')}
             </Text>
           </View>
         )}
@@ -197,10 +197,10 @@ export default function WorkerDashboardScreen() {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={[styles.actionTitle, { color: colors.textPrimary }]}>
-                የሙያ እና ተመን ማስተካከያ (Edit Profile)
+                {t('edit_worker_profile')}
               </Text>
               <Text style={[styles.actionSub, { color: colors.textSecondary }]}>
-                የስራ ዘርፍ፣ የሰዓት ዋጋ እና የድምጽ መግለጫ
+                {t('account_settings_sub')}
               </Text>
             </View>
             <ChevronRight size={18} color={colors.textMuted} />
@@ -224,10 +224,10 @@ export default function WorkerDashboardScreen() {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={[styles.actionTitle, { color: colors.textPrimary }]}>
-                ወደ ደንበኛ ገጽ ተመለስ (Client Mode)
+                {t('client_mode')}
               </Text>
               <Text style={[styles.actionSub, { color: colors.textSecondary }]}>
-                ባለሙያ መጥራት ሲፈልጉ ወደ ደንበኛ ሁነታ ይቀይሩ
+                {t('worker_banner_sub')}
               </Text>
             </View>
             <ChevronRight size={18} color={colors.textMuted} />

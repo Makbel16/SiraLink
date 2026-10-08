@@ -36,13 +36,24 @@ export default function JobDetailScreen() {
     queryFn: () => api.getJobById(id)
   });
 
+  const getStatusLabel = (status: JobStatus) => {
+    switch (status) {
+      case 'OPEN': return t('status_open');
+      case 'ASSIGNED': return t('status_assigned');
+      case 'IN_PROGRESS': return t('status_in_progress');
+      case 'COMPLETED': return t('status_completed');
+      case 'CANCELLED': return t('status_cancelled');
+      default: return status;
+    }
+  };
+
   const handleCompleteJob = async () => {
     try {
       await api.completeJob(id);
-      Alert.alert('ስራው ተጠናቋል!', 'ስራው መጠናቀቁ ተረጋግጧል። እባክዎ ባለሙያውን ይገምግሙ!');
+      Alert.alert(t('job_completed_success'), '');
       queryClient.invalidateQueries({ queryKey: ['job-detail', id] });
     } catch (err: any) {
-      Alert.alert('ስህተት', err.message);
+      Alert.alert(t('error'), err.message);
     }
   };
 
@@ -50,17 +61,17 @@ export default function JobDetailScreen() {
     setSubmittingRating(true);
     try {
       await api.submitRating(id, rating, comment.trim() || undefined);
-      Alert.alert('አመሰግናለሁ!', 'ግምገማዎ በተሳካ ሁኔታ ገብቷል!');
+      Alert.alert(t('review_submitted_success'), '');
       queryClient.invalidateQueries({ queryKey: ['job-detail', id] });
     } catch (err: any) {
-      Alert.alert('ስህተት', err.message);
+      Alert.alert(t('error'), err.message);
     } finally {
       setSubmittingRating(false);
     }
   };
 
   if (isLoading) return <LoadingState />;
-  if (error || !job) return <ErrorState message="የስራው ዝርዝር አልተገኘም" onRetry={refetch} />;
+  if (error || !job) return <ErrorState message={t('job_details_err')} onRetry={refetch} />;
 
   const isClient = user?.id === job.client_id;
   const isWorker = user?.id === job.worker_id;
@@ -95,7 +106,7 @@ export default function JobDetailScreen() {
             </View>
 
             <Badge
-              label={job.status}
+              label={getStatusLabel(job.status)}
               variant={
                 job.status === 'COMPLETED'
                   ? 'success'
@@ -107,7 +118,7 @@ export default function JobDetailScreen() {
           </View>
 
           <Text style={[styles.jobTitleText, { color: colors.textPrimary }]}>
-            {job.title || 'የስራ ጥያቄ'}
+            {job.title || t('job_request_default')}
           </Text>
         </View>
 
@@ -123,7 +134,7 @@ export default function JobDetailScreen() {
           ]}
         >
           <Text style={[styles.sectionCardTitle, { color: colors.textSecondary }]}>
-            የስራው ሂደት (Status Lifecycle)
+            {t('status_lifecycle')}
           </Text>
           <View style={styles.timelineRow}>
             {statuses.map((s, idx) => {
@@ -159,7 +170,7 @@ export default function JobDetailScreen() {
                       }
                     ]}
                   >
-                    {s}
+                    {getStatusLabel(s)}
                   </Text>
                 </View>
               );
@@ -182,10 +193,10 @@ export default function JobDetailScreen() {
             <View style={styles.sectionHeaderRow}>
               <Sparkles size={16} color={colors.accent} />
               <Text style={[styles.sectionCardTitle, { color: colors.textPrimary }]}>
-                የተቀረጸው የድምጽ መግለጫ (Voice Request)
+                {t('customer_voice')}
               </Text>
             </View>
-            <VoicePlayer audioUrl={job.audio_description_url} title="የደንበኛው ድምጽ" />
+            <VoicePlayer audioUrl={job.audio_description_url} title={t('listen_customer_voice')} />
           </View>
         )}
 
@@ -202,7 +213,7 @@ export default function JobDetailScreen() {
             ]}
           >
             <Text style={[styles.sectionCardTitle, { color: colors.textPrimary }]}>
-              የስራ ዝርዝር (Description)
+              {t('description_label')}
             </Text>
             <View
               style={[
@@ -232,16 +243,16 @@ export default function JobDetailScreen() {
           ]}
         >
           <Text style={[styles.sectionCardTitle, { color: colors.textPrimary }]}>
-            {isClient ? 'የተመደበው ባለሙያ (Assigned Worker)' : 'የስራው ባለቤት (Client)'}
+            {isClient ? t('assigned_worker') : t('job_owner')}
           </Text>
 
           <View style={styles.personCardRow}>
             <View style={{ flex: 1 }}>
               <Text style={[styles.personName, { color: colors.textPrimary }]}>
-                {isClient ? job.worker_name || 'በመፈለግ ላይ...' : job.client_name || 'ደንበኛ'}
+                {isClient ? job.worker_name || t('searching_worker') : job.client_name || t('client')}
               </Text>
               <Text style={[styles.personPhone, { color: colors.textSecondary }]}>
-                {isClient ? job.worker_phone || 'ስልክ ይገለጻል' : job.client_phone || ''}
+                {isClient ? job.worker_phone || t('phone_pending') : job.client_phone || ''}
               </Text>
             </View>
 
@@ -250,11 +261,11 @@ export default function JobDetailScreen() {
                 style={[styles.callBtn, { backgroundColor: colors.primary }]}
                 activeOpacity={0.8}
                 onPress={() =>
-                  Alert.alert('ደውል', `ደውል ወደ ${isClient ? job.worker_phone : job.client_phone}`)
+                  Alert.alert(t('call'), `${t('call')} ${isClient ? job.worker_phone : job.client_phone}`)
                 }
               >
                 <Phone size={16} color="#FFFFFF" />
-                <Text style={styles.callText}>ደውል</Text>
+                <Text style={styles.callText}>{t('call')}</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -272,10 +283,10 @@ export default function JobDetailScreen() {
             ]}
           >
             <Text style={[styles.priceLabel, { color: colors.textSecondary }]}>
-              የተስማሙበት ዋጋ (Offered Price)
+              {t('offered_price')}
             </Text>
             <Text style={[styles.priceValue, { color: colors.primary }]}>
-              {job.offered_price_etb} ETB
+              {job.offered_price_etb} {t('etb')}
             </Text>
           </View>
         )}
@@ -283,7 +294,7 @@ export default function JobDetailScreen() {
         {/* Complete Job Action Button */}
         {isClient && job.status === 'IN_PROGRESS' && (
           <Button
-            title="ስራው መጠናቀቁን አረጋግጥ (Mark Completed)"
+            title={t('mark_completed')}
             onPress={handleCompleteJob}
             variant="primary"
             size="lg"
@@ -304,7 +315,7 @@ export default function JobDetailScreen() {
             ]}
           >
             <Text style={[styles.sectionCardTitle, { color: colors.textPrimary }]}>
-              ባለሙያውን ይገምግሙ (Rate Worker)
+              {t('rate_worker')}
             </Text>
             <View style={styles.starsRow}>
               {[1, 2, 3, 4, 5].map((star) => (
@@ -327,7 +338,7 @@ export default function JobDetailScreen() {
                   color: colors.textPrimary
                 }
               ]}
-              placeholder="ስለ ስራው ጥራት እና ፍጥነት አስተያየት ይጻፉ..."
+              placeholder={t('rate_worker_placeholder')}
               placeholderTextColor={colors.textMuted}
               multiline
               numberOfLines={3}
@@ -336,7 +347,7 @@ export default function JobDetailScreen() {
             />
 
             <Button
-              title="ግምገማ አስገባ (Submit Review)"
+              title={t('submit_review')}
               onPress={handleSubmitRating}
               loading={submittingRating}
               size="md"

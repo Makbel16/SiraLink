@@ -71,7 +71,7 @@ export function MapView({
                 { color: viewMode === 'map' ? colors.primary : colors.textMuted }
               ]}
             >
-              ካርታ (Map)
+              {t('map_view')}
             </Text>
           </TouchableOpacity>
 
@@ -93,7 +93,7 @@ export function MapView({
                 { color: viewMode === 'list' ? colors.primary : colors.textMuted }
               ]}
             >
-              ዝርዝር ({workers.length})
+              {t('list_view')} ({workers.length})
             </Text>
           </TouchableOpacity>
         </View>
@@ -142,7 +142,7 @@ export function MapView({
             >
               <Navigation size={17} color="#FFFFFF" />
             </View>
-            <Text style={[styles.userPinLabel, { color: colors.textSecondary }]}>እርስዎ (You)</Text>
+            <Text style={[styles.userPinLabel, { color: colors.textSecondary }]}>{t('you')}</Text>
           </View>
 
           {/* Spatial Worker Markers Placed Relatively */}

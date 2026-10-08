@@ -14,12 +14,8 @@ import {
   MapPin,
   Bell,
   Sparkles,
-  SlidersHorizontal,
   Flame,
-  Award,
-  Zap,
-  ArrowRight,
-  TrendingUp
+  Award
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { api } from '../../services/api';
@@ -61,115 +57,125 @@ export default function ClientHomeScreen() {
       })
   });
 
-  // Rich 3D Category Data with tailored gradients, tags, and realistic price baselines
+  // Rich 3D Category Data with tailored gradients, tags, and price baselines
   const categoryCards: CategoryItemData[] = [
     {
       key: undefined,
-      label: 'ሁሉንም ስራዎች',
+      label: t('all_services'),
       enLabel: 'All Services',
       emoji: '✨',
       workerCount: 140,
-      startingPrice: 'ከ 300 ETB',
-      tag: '⭐ ሙሉ ዝርዝር',
+      startingPrice: 300,
+      tag: t('all_services_tag'),
+      tagKey: 'all_services_tag',
       gradient: ['#F0FDFA', '#CCFBF1'],
       darkGradient: ['#162036', '#0F172A']
     },
     {
       key: 'PLUMBING',
-      label: 'የቧንቧ ጥገና',
+      label: t('cat_plumbing'),
       enLabel: 'Plumbing',
       emoji: '🔧',
       workerCount: 48,
-      startingPrice: 'ከ 350 ETB',
-      tag: '🔥 ተፈላጊ',
+      startingPrice: 350,
+      tag: t('popular_tag'),
+      tagKey: 'popular_tag',
       gradient: ['#ECFEFF', '#CFFAFE'],
       darkGradient: ['#0E2A38', '#081B26']
     },
     {
       key: 'ELECTRICAL',
-      label: 'የኤሌክትሪክ ስራ',
+      label: t('cat_electrical'),
       enLabel: 'Electrical',
       emoji: '⚡',
       workerCount: 36,
-      startingPrice: 'ከ 400 ETB',
-      tag: '⚡ ፈጣን ጥሪ',
+      startingPrice: 400,
+      tag: t('fast_call_tag'),
+      tagKey: 'fast_call_tag',
       gradient: ['#FFFBEB', '#FEF3C7'],
       darkGradient: ['#2E2208', '#1A1303']
     },
     {
       key: 'CLEANING',
-      label: 'የቤት ጽዳት',
+      label: t('cat_cleaning'),
       enLabel: 'House Cleaning',
       emoji: '🧹',
       workerCount: 52,
-      startingPrice: 'ከ 250 ETB',
-      tag: '💎 የታመነ',
+      startingPrice: 250,
+      tag: t('trusted_tag'),
+      tagKey: 'trusted_tag',
       gradient: ['#EFF6FF', '#DBEAFE'],
       darkGradient: ['#0F2445', '#081426']
     },
     {
       key: 'PAINTING',
-      label: 'የቀለም ቅብ',
+      label: t('cat_painting'),
       enLabel: 'Painting',
       emoji: '🎨',
       workerCount: 29,
-      startingPrice: 'ከ 450 ETB',
-      tag: '🎨 ባለሙያ',
+      startingPrice: 450,
+      tag: t('quality_tag'),
+      tagKey: 'quality_tag',
       gradient: ['#FAF5FF', '#F3E8FF'],
       darkGradient: ['#26153B', '#150A21']
     },
     {
       key: 'CARPENTRY',
-      label: 'የእንጨት ስራ',
+      label: t('cat_carpentry'),
       enLabel: 'Carpentry',
       emoji: '🪚',
       workerCount: 31,
-      startingPrice: 'ከ 400 ETB',
-      tag: '🪵 ጥራት',
+      startingPrice: 400,
+      tag: t('quality_tag'),
+      tagKey: 'quality_tag',
       gradient: ['#FFF7ED', '#FFEDD5'],
       darkGradient: ['#2D1A0C', '#1A0E06']
     },
     {
       key: 'MECHANIC',
-      label: 'የመኪና ጥገና',
+      label: t('cat_mechanic'),
       enLabel: 'Auto Mechanic',
       emoji: '🚗',
       workerCount: 24,
-      startingPrice: 'ከ 500 ETB',
-      tag: '🚗 ፈጣን',
+      startingPrice: 500,
+      tag: t('speed_tag'),
+      tagKey: 'speed_tag',
       gradient: ['#FEF2F2', '#FEE2E2'],
       darkGradient: ['#301010', '#1C0808']
     },
     {
       key: 'CONSTRUCTION',
-      label: 'የግንባታ ስራ',
+      label: t('cat_construction'),
       enLabel: 'Construction',
       emoji: '🧱',
       workerCount: 42,
-      startingPrice: 'ከ 450 ETB',
-      tag: '🧱 ጠንካራ',
+      startingPrice: 450,
+      tag: t('quality_tag'),
+      tagKey: 'quality_tag',
       gradient: ['#FFF1F2', '#FFE4E6'],
       darkGradient: ['#2A1016', '#17080B']
     },
     {
       key: 'MOVING',
-      label: 'የእቃ ማጓጓዝ',
+      label: t('cat_moving'),
       enLabel: 'Movers & Truck',
       emoji: '📦',
       workerCount: 19,
-      startingPrice: 'ከ 600 ETB',
-      tag: '📦 አስተማማኝ',
+      startingPrice: 600,
+      tag: t('trusted_tag'),
+      tagKey: 'trusted_tag',
       gradient: ['#F0FDF4', '#DCFCE7'],
       darkGradient: ['#0C2918', '#06170D']
     },
     {
       key: 'GARDENING',
-      label: 'የአትክልት ስራ',
+      label: t('cat_gardening'),
       enLabel: 'Gardening',
       emoji: '🌱',
       workerCount: 22,
-      startingPrice: 'ከ 300 ETB',
-      tag: '🌿 ተፈጥሮ',
+      startingPrice: 300,
+      tag: t('quality_tag'),
+      tagKey: 'quality_tag',
       gradient: ['#F7FEE7', '#ECFCCB'],
       darkGradient: ['#1C2608', '#0E1404']
     }
@@ -181,14 +187,18 @@ export default function ClientHomeScreen() {
       params: {
         audioUrl: result.audioUrl,
         transcript: result.transcript,
-        category: result.category,
-        detectedLanguage: result.detectedLanguage
+        category: result.category
       }
     });
   };
 
   const handleManualInput = () => {
-    router.push('/job/create');
+    router.push({
+      pathname: '/job/create',
+      params: {
+        category: selectedCategory || 'PLUMBING'
+      }
+    });
   };
 
   const handleSelectWorker = (worker: NearbyWorker) => {
@@ -199,67 +209,61 @@ export default function ClientHomeScreen() {
     router.push({
       pathname: '/job/create',
       params: {
-        workerId: worker.user_id,
+        workerId: worker.id,
         category: worker.skill_category
       }
     });
   };
 
   const onRefresh = async () => {
-    await refreshLocation();
-    await refetchWorkers();
+    await Promise.all([refetchWorkers(), refreshLocation()]);
   };
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={onRefresh} />}
-        showsVerticalScrollIndicator={false}
+      {/* Top Header Bar */}
+      <View
+        style={[
+          styles.headerBar,
+          {
+            backgroundColor: colors.surfaceCard,
+            borderBottomColor: colors.border
+          }
+        ]}
       >
-        {/* Top Header Bar */}
-        <View
-          style={[
-            styles.headerBar,
-            {
-              backgroundColor: colors.surfaceCard,
-              borderBottomColor: colors.border
-            }
-          ]}
-        >
-          <View>
-            <View style={styles.brandRow}>
-              <Text style={[styles.brandText, { color: colors.primary }]}>ስራLink</Text>
-              <View style={[styles.brandDot, { backgroundColor: colors.accent }]} />
-            </View>
-            <TouchableOpacity
-              style={styles.locationRow}
-              activeOpacity={0.7}
-              onPress={refreshLocation}
-            >
-              <MapPin size={13} color={colors.primary} />
-              <Text style={[styles.locationText, { color: colors.textSecondary }]} numberOfLines={1}>
-                {currentLocation.district || 'Addis Ababa'}
-              </Text>
-            </TouchableOpacity>
+        <View>
+          <View style={styles.brandRow}>
+            <Text style={[styles.brandText, { color: colors.primary }]}>
+              {t('app_name')}
+            </Text>
+            <View style={[styles.brandDot, { backgroundColor: colors.accent }]} />
           </View>
-
-          <TouchableOpacity
-            style={[
-              styles.bellButton,
-              { backgroundColor: isDark ? colors.surfaceSubtle : '#F1F5F9' }
-            ]}
-            onPress={() => router.push('/(tabs)/messages')}
-          >
-            <Bell size={20} color={colors.textPrimary} />
-            <View style={[styles.unreadDot, { backgroundColor: colors.danger }]} />
-          </TouchableOpacity>
+          <View style={styles.locationRow}>
+            <MapPin size={13} color={colors.textSecondary} />
+            <Text style={[styles.locationText, { color: colors.textSecondary }]}>
+              {currentLocation.district || t('addis_ababa')}
+            </Text>
+          </View>
         </View>
 
-        {/* 3D Voice-First Hero Card */}
+        <TouchableOpacity
+          onPress={() => router.push('/messages')}
+          style={[styles.bellButton, { backgroundColor: isDark ? colors.surfaceSubtle : '#F1F5F9' }]}
+        >
+          <Bell size={20} color={colors.textPrimary} />
+          <View style={[styles.unreadDot, { backgroundColor: colors.accent }]} />
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={onRefresh} />}
+      >
+        {/* Ambient Glow Voice Centerpiece Hero Card */}
         <View
           style={[
-            styles.voiceHeroCard,
+            styles.voiceHeroContainer,
             {
               backgroundColor: colors.surfaceCard,
               borderColor: colors.border
@@ -267,16 +271,10 @@ export default function ClientHomeScreen() {
             colors.cardShadow
           ]}
         >
-          {/* Subtle Ambient Radial Glow */}
+          {/* Subtle Ambient Radial Backlight */}
           <LinearGradient
-            colors={
-              isDark
-                ? ['rgba(20, 184, 166, 0.25)', 'transparent']
-                : ['rgba(13, 148, 136, 0.12)', 'transparent']
-            }
-            start={{ x: 0.8, y: 0 }}
-            end={{ x: 0, y: 0.8 }}
-            style={styles.heroAmbientGlow}
+            colors={isDark ? ['rgba(20, 184, 166, 0.12)', 'transparent'] : ['rgba(20, 184, 166, 0.08)', 'transparent']}
+            style={styles.ambientGlowEffect}
           />
 
           <View style={styles.heroTextRow}>
@@ -288,7 +286,7 @@ export default function ClientHomeScreen() {
             >
               <Sparkles size={13} color={colors.accent} />
               <Text style={[styles.heroGreeting, { color: colors.accent }]}>
-                {user?.full_name ? `ሰላም ${user.full_name}` : t('welcome')}
+                {user?.full_name ? `${t('welcome')} ${user.full_name}` : t('welcome')}
               </Text>
             </View>
           </View>
@@ -299,6 +297,7 @@ export default function ClientHomeScreen() {
 
           {/* Voice Recording Centerpiece */}
           <VoiceRecorder
+            compact={true}
             onTranscriptionComplete={handleTranscriptionComplete}
             onManualInputRequested={handleManualInput}
           />
@@ -306,13 +305,13 @@ export default function ClientHomeScreen() {
           {/* Quick Voice Prompt Suggestions */}
           <View style={styles.suggestionsContainer}>
             <Text style={[styles.suggestionsLabel, { color: colors.textMuted }]}>
-              ፈጣን የስራ ጥያቄዎች (Tap to quick select):
+              {t('quick_prompts')}:
             </Text>
             <View style={styles.suggestionsRow}>
               {[
-                { label: '🔧 የቧንቧ ጥገና', cat: 'PLUMBING' as JobCategory },
-                { label: '⚡ የኤሌክትሪክ ሰራተኛ', cat: 'ELECTRICAL' as JobCategory },
-                { label: '🧹 የቤት ጽዳት', cat: 'CLEANING' as JobCategory }
+                { label: `🔧 ${t('cat_plumbing')}`, cat: 'PLUMBING' as JobCategory },
+                { label: `⚡ ${t('cat_electrical')}`, cat: 'ELECTRICAL' as JobCategory },
+                { label: `🧹 ${t('cat_cleaning')}`, cat: 'CLEANING' as JobCategory }
               ].map((sug, i) => (
                 <TouchableOpacity
                   key={i}
@@ -335,11 +334,11 @@ export default function ClientHomeScreen() {
           </View>
         </View>
 
-        {/* SECTION 1: Large 3D Horizontally Scrollable Category Cards */}
+        {/* SECTION 1: Category Cards */}
         <View style={styles.sectionHeader}>
           <View style={styles.sectionTitleRow}>
             <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
-              የስራ ዘርፎች (Service Categories)
+              {t('category')}
             </Text>
             <View
               style={[
@@ -348,11 +347,11 @@ export default function ClientHomeScreen() {
               ]}
             >
               <Flame size={12} color="#F59E0B" />
-              <Text style={styles.popularBadgeText}>ተወዳጅ</Text>
+              <Text style={styles.popularBadgeText}>{t('popular_tag')}</Text>
             </View>
           </View>
           <Text style={[styles.sectionSub, { color: colors.textSecondary }]}>
-            የሚፈልጉትን ሙያ ይምረጡ
+            {t('tap_and_speak')}
           </Text>
         </View>
 
@@ -376,13 +375,13 @@ export default function ClientHomeScreen() {
           })}
         </ScrollView>
 
-        {/* SECTION 2: Large 3D Horizontally Scrollable Featured Workers */}
+        {/* SECTION 2: Featured Workers */}
         {workers.length > 0 && (
           <>
             <View style={styles.sectionHeader}>
               <View style={styles.sectionTitleRow}>
                 <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
-                  ተወዳጅ ባለሙያዎች (Top Rated Workers)
+                  {t('top_rated_workers')}
                 </Text>
                 <View
                   style={[
@@ -391,11 +390,11 @@ export default function ClientHomeScreen() {
                   ]}
                 >
                   <Award size={12} color={colors.primary} />
-                  <Text style={[styles.popularBadgeText, { color: colors.primary }]}>ደረጃ 1</Text>
+                  <Text style={[styles.popularBadgeText, { color: colors.primary }]}>{t('verified')}</Text>
                 </View>
               </View>
               <Text style={[styles.sectionSub, { color: colors.textSecondary }]}>
-                በአቅራቢያዎ ያሉ ከፍተኛ ግምገማ ያገኙ ባለሙያዎች
+                {t('top_rated_workers_sub')}
               </Text>
             </View>
 
@@ -422,10 +421,10 @@ export default function ClientHomeScreen() {
         <View style={styles.sectionHeader}>
           <View style={styles.sectionTitleRow}>
             <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
-              {t('nearby_workers')} (ካርታ እና ራዳር)
+              {t('nearby_workers')}
             </Text>
             <Text style={[styles.workerCountPill, { color: colors.primary }]}>
-              {workers.length > 0 ? `(${workers.length} ተገኝተዋል)` : ''}
+              {workers.length > 0 ? `(${workers.length} ${t('jobs_found')})` : ''}
             </Text>
           </View>
 
@@ -459,7 +458,7 @@ export default function ClientHomeScreen() {
                       }
                     ]}
                   >
-                    {r}km
+                    {r}{t('km')}
                   </Text>
                 </TouchableOpacity>
               );
@@ -468,7 +467,7 @@ export default function ClientHomeScreen() {
         </View>
 
         {isWorkersLoading ? (
-          <LoadingState message="ባለሙያዎችን በመፈለግ ላይ..." />
+          <LoadingState message={t('loading')} />
         ) : (
           <View
             style={[
@@ -550,57 +549,59 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4
   },
-  voiceHeroCard: {
+  voiceHeroContainer: {
     marginHorizontal: 16,
-    marginTop: 16,
-    paddingVertical: 22,
-    paddingHorizontal: 18,
-    borderRadius: 26,
+    marginTop: 12,
+    marginBottom: 16,
+    borderRadius: 22,
     borderWidth: 1,
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 14,
     position: 'relative',
     overflow: 'hidden'
   },
-  heroAmbientGlow: {
+  ambientGlowEffect: {
     position: 'absolute',
-    top: -50,
-    right: -50,
-    width: 160,
-    height: 160,
-    borderRadius: 80
+    top: -30,
+    left: '20%',
+    width: 200,
+    height: 200,
+    borderRadius: 100
   },
   heroTextRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 6
+    marginBottom: 4
   },
   greetingPill: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12
+    paddingHorizontal: 9,
+    paddingVertical: 3,
+    borderRadius: 10
   },
   heroGreeting: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '800'
   },
   heroTitle: {
-    fontSize: 22,
+    fontSize: 17,
     fontWeight: '900',
-    marginBottom: 16,
-    letterSpacing: -0.4
+    letterSpacing: -0.3,
+    marginBottom: 8
   },
   suggestionsContainer: {
-    marginTop: 18,
-    paddingTop: 14,
+    marginTop: 10,
+    paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(150, 150, 150, 0.1)'
+    borderTopColor: 'rgba(0, 0, 0, 0.05)'
   },
   suggestionsLabel: {
     fontSize: 11,
-    fontWeight: '700',
-    marginBottom: 8
+    fontWeight: '600',
+    marginBottom: 6
   },
   suggestionsRow: {
     flexDirection: 'row',
@@ -608,24 +609,24 @@ const styles = StyleSheet.create({
     gap: 8
   },
   suggestionPill: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 14,
     borderWidth: 1
   },
   suggestionText: {
     fontSize: 12,
-    fontWeight: '600'
+    fontWeight: '700'
   },
   sectionHeader: {
     paddingHorizontal: 20,
-    marginTop: 26,
-    marginBottom: 14
+    marginBottom: 12,
+    marginTop: 8
   },
   sectionTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8
+    justifyContent: 'space-between'
   },
   sectionTitle: {
     fontSize: 18,
@@ -635,13 +636,13 @@ const styles = StyleSheet.create({
   popularBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 3,
+    gap: 4,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 8
   },
   popularBadgeText: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '800',
     color: '#D97706'
   },
@@ -650,9 +651,14 @@ const styles = StyleSheet.create({
     marginTop: 2,
     fontWeight: '500'
   },
+  largeCardsScroll: {
+    paddingHorizontal: 18,
+    gap: 12,
+    paddingBottom: 8
+  },
   workerCountPill: {
-    fontSize: 13,
-    fontWeight: '800'
+    fontSize: 12,
+    fontWeight: '700'
   },
   radiusSelector: {
     flexDirection: 'row',
@@ -662,29 +668,24 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start'
   },
   radiusBtn: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
     borderRadius: 8
   },
   radiusBtnActive: {
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.12,
+    shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2
   },
   radiusText: {
     fontSize: 12
   },
-  largeCardsScroll: {
-    paddingHorizontal: 16,
-    gap: 12,
-    paddingVertical: 6
-  },
   mapCardWrapper: {
     marginHorizontal: 16,
     borderRadius: 24,
-    borderWidth: 1,
     overflow: 'hidden',
+    borderWidth: 1,
     marginTop: 4
   }
 });

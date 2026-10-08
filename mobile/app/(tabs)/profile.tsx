@@ -86,10 +86,10 @@ export default function ProfileTabScreen() {
   };
 
   const handleLogout = () => {
-    Alert.alert('ውጣ (Log Out)', 'እርግጠኛ ነዎት ከስራLink መውጣት ይፈልጋሉ?', [
-      { text: 'ይቅር (Cancel)', style: 'cancel' },
+    Alert.alert(t('logout'), t('logout_confirm_msg'), [
+      { text: t('cancel'), style: 'cancel' },
       {
-        text: 'ውጣ (Logout)',
+        text: t('logout'),
         style: 'destructive',
         onPress: async () => {
           await logout();
@@ -106,11 +106,11 @@ export default function ProfileTabScreen() {
 
   const handleHelpSupport = () => {
     Alert.alert(
-      'የደንበኞች ድጋፍ (Help & Support)',
-      'የስራLink ድጋፍ ማዕከልን ማግኘት ይፈልጋሉ?\nስልክ: 8199 ወይም +251 911 000 000',
+      t('help_and_support'),
+      t('help_support_msg'),
       [
-        { text: 'ዝጋ (Close)', style: 'cancel' },
-        { text: 'ይደውሉ (Call)', onPress: () => {} }
+        { text: t('close'), style: 'cancel' },
+        { text: t('call'), onPress: () => {} }
       ]
     );
   };
@@ -140,7 +140,7 @@ export default function ProfileTabScreen() {
                 {t('profile')}
               </Text>
               <Text style={[styles.topSubtitle, { color: colors.textSecondary }]}>
-                የመለያዎ እና የአገልግሎት ቅንብሮች
+                {t('account_settings_sub')}
               </Text>
             </View>
 
@@ -156,7 +156,7 @@ export default function ProfileTabScreen() {
             >
               <ShieldCheck size={14} color={colors.primary} />
               <Text style={[styles.trustBadgeText, { color: colors.primary }]}>
-                {user?.is_verified ? 'የተረጋገጠ (Verified)' : 'ተጠቃሚ (Member)'}
+                {user?.is_verified ? t('verified_member') : t('member')}
               </Text>
             </View>
           </View>
@@ -204,7 +204,7 @@ export default function ProfileTabScreen() {
               <View style={styles.heroDetails}>
                 <View style={styles.nameRow}>
                   <Text style={[styles.userNameText, { color: colors.textPrimary }]} numberOfLines={1}>
-                    {user?.full_name || 'የስራLink ተጠቃሚ'}
+                    {user?.full_name || t('member')}
                   </Text>
                   <Sparkles size={16} color={colors.accent} />
                 </View>
@@ -282,7 +282,7 @@ export default function ProfileTabScreen() {
                   </Text>
                 </View>
                 <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
-                  {user?.role === 'WORKER' ? 'የተሰሩ ስራዎች' : 'የተጠየቁ ስራዎች'}
+                  {user?.role === 'WORKER' ? t('completed_jobs_stat') : t('requested_jobs_stat')}
                 </Text>
               </View>
 
@@ -293,7 +293,9 @@ export default function ProfileTabScreen() {
                   <Star size={14} color="#F59E0B" fill="#F59E0B" />
                   <Text style={[styles.statValue, { color: colors.textPrimary }]}>4.9</Text>
                 </View>
-                <Text style={[styles.statLabel, { color: colors.textSecondary }]}>አጠቃላይ ደረጃ</Text>
+                <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
+                  {t('overall_rating')}
+                </Text>
               </View>
 
               <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
@@ -303,7 +305,9 @@ export default function ProfileTabScreen() {
                   <Award size={14} color={colors.primary} />
                   <Text style={[styles.statValue, { color: colors.textPrimary }]}>100%</Text>
                 </View>
-                <Text style={[styles.statLabel, { color: colors.textSecondary }]}>የስራ እርካታ</Text>
+                <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
+                  {t('job_satisfaction')}
+                </Text>
               </View>
             </View>
           </View>
@@ -311,7 +315,7 @@ export default function ProfileTabScreen() {
           {/* Section: Night Mode Hero Feature Card */}
           <View style={styles.sectionContainer}>
             <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>
-              ገጽታ እና እይታ (APPEARANCE)
+              {t('appearance')}
             </Text>
 
             <TouchableOpacity
@@ -346,18 +350,18 @@ export default function ProfileTabScreen() {
                 <View style={styles.nightModeTextWrapper}>
                   <View style={styles.nightModeTitleRow}>
                     <Text style={[styles.nightModeTitle, { color: colors.textPrimary }]}>
-                      {isDark ? 'የሌሊት ገጽታ (Night Mode)' : 'የቀን ገጽታ (Day Mode)'}
+                      {isDark ? t('night_mode') : t('day_mode')}
                     </Text>
                     {isDark && (
                       <View style={styles.activePill}>
-                        <Text style={styles.activePillText}>በርቷል (ON)</Text>
+                        <Text style={styles.activePillText}>{t('on')}</Text>
                       </View>
                     )}
                   </View>
                   <Text style={[styles.nightModeSubtitle, { color: colors.textSecondary }]}>
                     {isDark
-                      ? 'የጨለመ ገጽታ ለአይን ምቹ እና ባትሪ ቆጣቢ ነው'
-                      : 'ወደ ሌሊት ገጽታ ለመቀየር እዚህ ይጫኑ'}
+                      ? t('night_mode_desc_on')
+                      : t('night_mode_desc_off')}
                   </Text>
                 </View>
               </View>
@@ -394,7 +398,7 @@ export default function ProfileTabScreen() {
           {/* Section: Worker Mode Switcher Banner */}
           <View style={styles.sectionContainer}>
             <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>
-              የስራ ሁነታ (SERVICES & WORK)
+              {t('services_and_work')}
             </Text>
 
             <TouchableOpacity
@@ -424,11 +428,11 @@ export default function ProfileTabScreen() {
                   </Text>
                   <View style={styles.earningBadge}>
                     <Zap size={11} color="#FFFFFF" />
-                    <Text style={styles.earningBadgeText}>ገቢ ያግኙ</Text>
+                    <Text style={styles.earningBadgeText}>{t('earn_income')}</Text>
                   </View>
                 </View>
                 <Text style={[styles.workerBannerSub, { color: colors.textSecondary }]}>
-                  የራስዎን ሙያ ያካፍሉ፣ በአቅራቢያዎ ያሉ ስራዎችን ይቀበሉ
+                  {t('worker_banner_sub')}
                 </Text>
               </View>
 
@@ -446,7 +450,7 @@ export default function ProfileTabScreen() {
           {/* Section: Preferences & Language Card */}
           <View style={styles.sectionContainer}>
             <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>
-              ቅንብሮች (PREFERENCES & SETTINGS)
+              {t('preferences')}
             </Text>
 
             <View
@@ -483,7 +487,7 @@ export default function ProfileTabScreen() {
                     {t('select_language')}
                   </Text>
                   <Text style={[styles.menuRowSubtitle, { color: colors.textSecondary }]}>
-                    ቋንቋ ይምረጡ (Amharic, English, Oromoo)
+                    {getLangName(language)}
                   </Text>
                 </View>
 
@@ -524,10 +528,10 @@ export default function ProfileTabScreen() {
 
                 <View style={styles.menuRowText}>
                   <Text style={[styles.menuRowTitle, { color: colors.textPrimary }]}>
-                    ማሳወቂያዎች (Notifications)
+                    {t('notifications_title')}
                   </Text>
                   <Text style={[styles.menuRowSubtitle, { color: colors.textSecondary }]}>
-                    የስራ ጥያቄ እና መልዕክት ድምጾች
+                    {t('notifications_sub')}
                   </Text>
                 </View>
 
@@ -555,10 +559,10 @@ export default function ProfileTabScreen() {
 
                 <View style={styles.menuRowText}>
                   <Text style={[styles.menuRowTitle, { color: colors.textPrimary }]}>
-                    እርዳታ እና ድጋፍ (Help & Support)
+                    {t('help_and_support')}
                   </Text>
                   <Text style={[styles.menuRowSubtitle, { color: colors.textSecondary }]}>
-                    የቀጥታ ስልክ መስመር 8199 ወይም ፈጣን ጥያቄዎች
+                    {t('help_and_support_sub')}
                   </Text>
                 </View>
 
@@ -581,17 +585,17 @@ export default function ProfileTabScreen() {
           >
             <LogOut size={19} color={colors.danger} />
             <Text style={[styles.logoutText, { color: colors.danger }]}>
-              {t('logout')} (ውጣ)
+              {t('logout')}
             </Text>
           </TouchableOpacity>
 
           {/* Elegant Footer Details */}
           <View style={styles.footerContainer}>
             <Text style={[styles.brandFooterText, { color: colors.textMuted }]}>
-              ስራLink (SiraLink) • Addis Ababa, Ethiopia
+              {t('app_name')} • {t('addis_ababa')}
             </Text>
             <Text style={[styles.versionFooterText, { color: colors.textMuted }]}>
-              Version 1.0.0 • Voice-First Marketplace
+              {t('version')} 1.0.0 • {t('tagline')}
             </Text>
           </View>
         </Animated.View>

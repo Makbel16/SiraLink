@@ -24,11 +24,13 @@ import { useTheme } from '../context/ThemeContext';
 interface VoiceRecorderProps {
   onTranscriptionComplete: (result: TranscriptionResult) => void;
   onManualInputRequested?: () => void;
+  compact?: boolean;
 }
 
 export function VoiceRecorder({
   onTranscriptionComplete,
-  onManualInputRequested
+  onManualInputRequested,
+  compact = false
 }: VoiceRecorderProps) {
   const { t } = useTranslation();
   const { colors, isDark } = useTheme();
@@ -168,6 +170,142 @@ export function VoiceRecorder({
     const s = secs % 60;
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
+
+  if (compact) {
+    return (
+      <View style={styles.compactRoot}>
+        <View
+          style={[
+            styles.compactContainer,
+            {
+              backgroundColor: isDark ? colors.surfaceSubtle : '#F8FAFC',
+              borderColor: isRecording ? colors.danger : colors.border
+            }
+          ]}
+        >
+          {/* Left: Compact Mic Button */}
+          <View style={styles.compactMicWrap}>
+            {isRecording && (
+              <Animated.View
+                style={[
+                  styles.compactPulseRing,
+                  {
+                    transform: [{ scale: pulseAnim }],
+                    backgroundColor: 'rgba(239, 68, 68, 0.25)'
+                  }
+                ]}
+              />
+            )}
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={
+                isRecording
+                  ? stopAndUploadRecording
+                  : isProcessing
+                  ? undefined
+                  : startRecording
+              }
+              disabled={isProcessing}
+              style={[
+                styles.compactMicBtn,
+                { backgroundColor: colors.primary },
+                isRecording && styles.compactMicBtnActive,
+                isProcessing && styles.compactMicBtnProcessing
+              ]}
+            >
+              {isProcessing ? (
+                <ActivityIndicator size="small" color="#FFFFFF" />
+              ) : isRecording ? (
+                <Square size={18} color="#FFFFFF" fill="#FFFFFF" />
+              ) : (
+                <Mic size={22} color="#FFFFFF" />
+              )}
+            </TouchableOpacity>
+          </View>
+
+          {/* Center: Live Status / Title */}
+          <View style={styles.compactInfo}>
+            {isRecording ? (
+              <View>
+                <View style={styles.compactRecordingRow}>
+                  <View style={styles.recordingDot} />
+                  <Text style={[styles.compactTimer, { color: colors.danger }]}>
+                    {formatTime(durationSecs)}
+                  </Text>
+                  <Text style={[styles.compactLiveLabel, { color: colors.danger }]}>
+                    {t('listening')}
+                  </Text>
+                </View>
+                <Text style={[styles.compactHintText, { color: colors.textSecondary }]}>
+                  {t('tap_to_finish')}
+                </Text>
+              </View>
+            ) : isProcessing ? (
+              <View>
+                <Text style={[styles.compactTitleText, { color: colors.primary }]}>
+                  {t('processing')}
+                </Text>
+                <Text style={[styles.compactHintText, { color: colors.textSecondary }]}>
+                  {t('transcribing')}
+                </Text>
+              </View>
+            ) : (
+              <View>
+                <Text style={[styles.compactTitleText, { color: colors.textPrimary }]}>
+                  {t('tap_and_speak')}
+                </Text>
+                <Text style={[styles.compactHintText, { color: colors.textSecondary }]}>
+                  {t('voice_assistant_hint')}
+                </Text>
+              </View>
+            )}
+          </View>
+
+          {/* Right: Cancel button if recording, or Manual input button if idle */}
+          <View style={styles.compactRightAction}>
+            {isRecording ? (
+              <TouchableOpacity
+                onPress={cancelRecording}
+                style={[
+                  styles.compactIconBtn,
+                  { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#E2E8F0' }
+                ]}
+              >
+                <RotateCcw size={15} color={colors.textSecondary} />
+              </TouchableOpacity>
+            ) : onManualInputRequested ? (
+              <TouchableOpacity
+                onPress={onManualInputRequested}
+                style={[
+                  styles.compactManualPill,
+                  {
+                    backgroundColor: isDark ? 'rgba(20, 184, 166, 0.15)' : '#CCFBF1',
+                    borderColor: isDark ? 'rgba(20, 184, 166, 0.3)' : '#99F6E4'
+                  }
+                ]}
+                activeOpacity={0.75}
+              >
+                <Edit3 size={13} color={colors.primary} />
+                <Text style={[styles.compactManualText, { color: colors.primary }]}>
+                  {t('enter_manually')}
+                </Text>
+              </TouchableOpacity>
+            ) : null}
+          </View>
+        </View>
+
+        {/* Error message if any */}
+        {errorMsg && (
+          <View style={[styles.compactErrorBox, { backgroundColor: isDark ? colors.dangerLight : '#FEF2F2' }]}>
+            <Text style={[styles.errorText, { color: colors.danger }]}>{errorMsg}</Text>
+            <TouchableOpacity onPress={startRecording} style={styles.retryBtn}>
+              <Text style={styles.retryText}>{t('retry')}</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -430,5 +568,117 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#0F766E',
     fontWeight: '600'
+  },
+  compactRoot: {
+    width: '100%',
+    marginVertical: 4
+  },
+  compactContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 20,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    gap: 12
+  },
+  compactMicWrap: {
+    width: 48,
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative'
+  },
+  compactPulseRing: {
+    position: 'absolute',
+    width: 48,
+    height: 48,
+    borderRadius: 24
+  },
+  compactMicBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#0F766E',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 4
+  },
+  compactMicBtnActive: {
+    backgroundColor: '#EF4444',
+    shadowColor: '#EF4444'
+  },
+  compactMicBtnProcessing: {
+    backgroundColor: '#D97706',
+    shadowColor: '#D97706'
+  },
+  compactInfo: {
+    flex: 1,
+    justifyContent: 'center'
+  },
+  compactRecordingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 2
+  },
+  compactTimer: {
+    fontSize: 14,
+    fontWeight: '800'
+  },
+  compactLiveLabel: {
+    fontSize: 12,
+    fontWeight: '700'
+  },
+  compactTitleText: {
+    fontSize: 14,
+    fontWeight: '800',
+    letterSpacing: -0.2
+  },
+  compactHintText: {
+    fontSize: 11,
+    fontWeight: '500',
+    marginTop: 1
+  },
+  compactSubHint: {
+    fontSize: 11,
+    fontWeight: '500',
+    marginTop: 1
+  },
+  compactRightAction: {
+    alignItems: 'flex-end',
+    justifyContent: 'center'
+  },
+  compactIconBtn: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  compactManualPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+    borderWidth: 1
+  },
+  compactManualText: {
+    fontSize: 11,
+    fontWeight: '700'
+  },
+  compactErrorBox: {
+    marginTop: 8,
+    padding: 10,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8
   }
 });

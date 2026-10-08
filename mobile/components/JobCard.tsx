@@ -101,7 +101,7 @@ export function JobCard({ job, onPress, isWorkerPerspective = false }: JobCardPr
               ]}
             >
               <Text style={[styles.priceText, { color: colors.primary }]}>
-                {job.offered_price_etb} ETB
+                {job.offered_price_etb} {t('etb')}
               </Text>
             </View>
           ) : null}

@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { I18nProvider } from '../utils/i18n';
+import { I18nProvider, useTranslation } from '../utils/i18n';
 import { AuthProvider } from '../context/AuthContext';
 import { LocationProvider } from '../context/LocationContext';
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
@@ -17,6 +17,7 @@ const queryClient = new QueryClient({
 
 function RootNavigation() {
   const { isDark, colors } = useTheme();
+  const { t } = useTranslation();
 
   return (
     <>
@@ -36,19 +37,19 @@ function RootNavigation() {
         }}
       >
         <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="language" options={{ title: 'Language / ቋንቋ' }} />
+        <Stack.Screen name="language" options={{ title: t('select_language') }} />
         <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-        <Stack.Screen name="login" options={{ title: 'Login' }} />
-        <Stack.Screen name="verify-otp" options={{ title: 'Verify Phone' }} />
+        <Stack.Screen name="login" options={{ title: t('login') }} />
+        <Stack.Screen name="verify-otp" options={{ title: t('verify') }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="job/create" options={{ title: 'Confirm Service Request' }} />
-        <Stack.Screen name="job/[id]" options={{ title: 'Job Details' }} />
-        <Stack.Screen name="worker/[id]" options={{ title: 'Worker Profile' }} />
-        <Stack.Screen name="worker/index" options={{ title: 'Worker Dashboard' }} />
-        <Stack.Screen name="worker/jobs" options={{ title: 'Incoming Requests' }} />
-        <Stack.Screen name="worker/profile" options={{ title: 'Edit Worker Profile' }} />
-        <Stack.Screen name="worker/job/[id]" options={{ title: 'Active Job' }} />
-        <Stack.Screen name="settings" options={{ title: 'Settings' }} />
+        <Stack.Screen name="job/create" options={{ title: t('confirm_request') }} />
+        <Stack.Screen name="job/[id]" options={{ title: t('job_details') }} />
+        <Stack.Screen name="worker/[id]" options={{ title: t('profile') }} />
+        <Stack.Screen name="worker/index" options={{ title: t('worker_mode') }} />
+        <Stack.Screen name="worker/jobs" options={{ title: t('incoming_requests') }} />
+        <Stack.Screen name="worker/profile" options={{ title: t('edit_worker_profile') }} />
+        <Stack.Screen name="worker/job/[id]" options={{ title: t('active_job') }} />
+        <Stack.Screen name="settings" options={{ title: t('settings') }} />
       </Stack>
     </>
   );
