@@ -21,8 +21,8 @@ export default function OnboardingScreen() {
       {/* Feature Highlights */}
       <View style={styles.featuresList}>
         <View style={styles.featureItem}>
-          <View style={[styles.iconBox, { backgroundColor: '#F0FDFA' }]}>
-            <Mic size={24} color="#0F766E" />
+          <View style={[styles.iconBox, { backgroundColor: '#DBEAFE' }]}>
+            <Mic size={24} color="#2563EB" />
           </View>
           <View style={styles.featureText}>
             <Text style={styles.featureTitle}>{t('record_voice')}</Text>
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 24,
-    backgroundColor: '#0F766E',
+    backgroundColor: '#2563EB',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12

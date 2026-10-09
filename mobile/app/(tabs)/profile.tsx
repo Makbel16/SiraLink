@@ -149,8 +149,8 @@ export default function ProfileTabScreen() {
               style={[
                 styles.trustBadge,
                 {
-                  backgroundColor: isDark ? 'rgba(20, 184, 166, 0.15)' : '#F0FDFA',
-                  borderColor: isDark ? 'rgba(20, 184, 166, 0.3)' : '#CCFBF1'
+                  backgroundColor: isDark ? colors.surfaceSubtle : '#EFF6FF',
+                  borderColor: isDark ? colors.border : '#DBEAFE'
                 }
               ]}
             >
@@ -240,12 +240,8 @@ export default function ProfileTabScreen() {
                       {
                         backgroundColor:
                           user?.role === 'WORKER'
-                            ? isDark
-                              ? 'rgba(245, 158, 11, 0.18)'
-                              : '#FEF3C7'
-                            : isDark
-                            ? 'rgba(20, 184, 166, 0.18)'
-                            : '#CCFBF1'
+                            ? (isDark ? 'rgba(245, 158, 11, 0.18)' : '#FEF3C7')
+                            : colors.primaryLight
                       }
                     ]}
                   >
@@ -405,8 +401,8 @@ export default function ProfileTabScreen() {
               style={[
                 styles.workerBannerCard,
                 {
-                  backgroundColor: isDark ? '#142834' : '#F0FDFA',
-                  borderColor: isDark ? 'rgba(20, 184, 166, 0.3)' : '#CCFBF1'
+                  backgroundColor: isDark ? colors.surfaceSubtle : '#EFF6FF',
+                  borderColor: isDark ? colors.border : '#DBEAFE'
                 }
               ]}
               activeOpacity={0.85}
@@ -415,7 +411,7 @@ export default function ProfileTabScreen() {
               <View
                 style={[
                   styles.workerIconBubble,
-                  { backgroundColor: isDark ? colors.primaryLight : '#0D9488' }
+                  { backgroundColor: colors.primary }
                 ]}
               >
                 <Briefcase size={22} color="#FFFFFF" />
@@ -791,7 +787,7 @@ const styles = StyleSheet.create({
     fontWeight: '700'
   },
   activePill: {
-    backgroundColor: '#0D9488',
+    backgroundColor: '#2563EB',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 6
@@ -854,7 +850,7 @@ const styles = StyleSheet.create({
     fontWeight: '800'
   },
   earningBadge: {
-    backgroundColor: '#0D9488',
+    backgroundColor: '#2563EB',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 3,

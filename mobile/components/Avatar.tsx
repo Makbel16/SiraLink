@@ -1,5 +1,6 @@
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { ShieldCheck } from 'lucide-react-native';
+import { useTheme } from '../context/ThemeContext';
 
 interface AvatarProps {
   name?: string | null;
@@ -9,6 +10,8 @@ interface AvatarProps {
 }
 
 export function Avatar({ name, imageUrl, size = 52, isVerified = false }: AvatarProps) {
+  const { colors } = useTheme();
+
   const getInitials = (n?: string | null): string => {
     if (!n) return 'S';
     const parts = n.trim().split(' ');
@@ -32,7 +35,8 @@ export function Avatar({ name, imageUrl, size = 52, isVerified = false }: Avatar
             {
               width: size,
               height: size,
-              borderRadius: size / 2
+              borderRadius: size / 2,
+              backgroundColor: colors.primary
             }
           ]}
         >
@@ -43,7 +47,7 @@ export function Avatar({ name, imageUrl, size = 52, isVerified = false }: Avatar
       )}
 
       {isVerified && (
-        <View style={styles.verifiedBadge}>
+        <View style={[styles.verifiedBadge, { backgroundColor: colors.primary }]}>
           <ShieldCheck size={14} color="#FFFFFF" />
         </View>
       )}
@@ -53,7 +57,7 @@ export function Avatar({ name, imageUrl, size = 52, isVerified = false }: Avatar
 
 const styles = StyleSheet.create({
   placeholder: {
-    backgroundColor: '#0F766E',
+    backgroundColor: '#2563EB',
     alignItems: 'center',
     justifyContent: 'center'
   },

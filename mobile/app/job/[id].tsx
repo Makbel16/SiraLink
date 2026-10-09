@@ -98,7 +98,7 @@ export default function JobDetailScreen() {
               style={[
                 styles.categoryChip,
                 {
-                  backgroundColor: isDark ? 'rgba(20, 184, 166, 0.18)' : '#CCFBF1'
+                  backgroundColor: colors.primaryLight
                 }
               ]}
             >
@@ -277,8 +277,8 @@ export default function JobDetailScreen() {
             style={[
               styles.priceBanner,
               {
-                backgroundColor: isDark ? '#142834' : '#F0FDFA',
-                borderColor: isDark ? 'rgba(20, 184, 166, 0.3)' : '#CCFBF1'
+                backgroundColor: isDark ? colors.surfaceSubtle : '#EFF6FF',
+                borderColor: isDark ? colors.border : '#DBEAFE'
               }
             ]}
           >

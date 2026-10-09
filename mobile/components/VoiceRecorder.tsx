@@ -279,8 +279,8 @@ export function VoiceRecorder({
                 style={[
                   styles.compactManualPill,
                   {
-                    backgroundColor: isDark ? 'rgba(20, 184, 166, 0.15)' : '#CCFBF1',
-                    borderColor: isDark ? 'rgba(20, 184, 166, 0.3)' : '#99F6E4'
+                    backgroundColor: colors.primaryLight,
+                    borderColor: isDark ? colors.border : '#BFDBFE'
                   }
                 ]}
                 activeOpacity={0.75}
@@ -437,20 +437,20 @@ const styles = StyleSheet.create({
     width: 140,
     height: 140,
     borderRadius: 70,
-    backgroundColor: 'rgba(15, 118, 110, 0.25)'
+    backgroundColor: 'rgba(37, 99, 235, 0.20)'
   },
   micButton: {
     width: 96,
     height: 96,
     borderRadius: 48,
-    backgroundColor: '#0F766E',
+    backgroundColor: '#2563EB',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#0F766E',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.35,
-    shadowRadius: 16,
-    elevation: 10
+    shadowColor: '#2563EB',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 5
   },
   micButtonActive: {
     backgroundColor: '#EF4444',
@@ -482,7 +482,7 @@ const styles = StyleSheet.create({
   },
   hintText: {
     fontSize: 14,
-    color: '#0F766E',
+    color: '#2563EB',
     fontWeight: '600'
   },
   processingText: {
@@ -548,12 +548,12 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: '#CCFBF1',
+    backgroundColor: '#DBEAFE',
     borderRadius: 8
   },
   manualText: {
     fontSize: 12,
-    color: '#0F766E',
+    color: '#2563EB',
     fontWeight: '600'
   },
   manualLinkButton: {
@@ -566,7 +566,7 @@ const styles = StyleSheet.create({
   },
   manualLinkText: {
     fontSize: 14,
-    color: '#0F766E',
+    color: '#2563EB',
     fontWeight: '600'
   },
   compactRoot: {
@@ -601,11 +601,11 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#0F766E',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 4
+    shadowColor: '#2563EB',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.18,
+    shadowRadius: 5,
+    elevation: 3
   },
   compactMicBtnActive: {
     backgroundColor: '#EF4444',

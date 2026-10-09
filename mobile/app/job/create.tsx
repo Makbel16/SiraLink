@@ -70,7 +70,7 @@ export default function CreateJobScreen() {
   });
 
   const categories: { key: JobCategory; icon: any; color: string }[] = [
-    { key: 'PLUMBING', icon: Wrench, color: '#0D9488' },
+    { key: 'PLUMBING', icon: Wrench, color: '#2563EB' },
     { key: 'ELECTRICAL', icon: Zap, color: '#F59E0B' },
     { key: 'CARPENTRY', icon: Hammer, color: '#92400E' },
     { key: 'PAINTING', icon: Paintbrush, color: '#7C3AED' },
@@ -151,7 +151,7 @@ export default function CreateJobScreen() {
             <View
               style={[
                 styles.badgePill,
-                { backgroundColor: isDark ? 'rgba(20, 184, 166, 0.18)' : '#CCFBF1' }
+                { backgroundColor: colors.primaryLight }
               ]}
             >
               <Sparkles size={13} color={colors.primary} />
@@ -196,7 +196,7 @@ export default function CreateJobScreen() {
             ]}
           >
             <View style={styles.cardHeaderRow}>
-              <View style={[styles.cardIconCircle, { backgroundColor: isDark ? 'rgba(20, 184, 166, 0.15)' : '#CCFBF1' }]}>
+              <View style={[styles.cardIconCircle, { backgroundColor: colors.primaryLight }]}>
                 <ShieldCheck size={16} color={colors.primary} />
               </View>
               <Text style={[styles.sectionCardTitle, { color: colors.textPrimary }]}>
@@ -267,7 +267,7 @@ export default function CreateJobScreen() {
           ]}
         >
           <View style={styles.cardHeaderRow}>
-            <View style={[styles.cardIconCircle, { backgroundColor: isDark ? 'rgba(20, 184, 166, 0.15)' : '#CCFBF1' }]}>
+            <View style={[styles.cardIconCircle, { backgroundColor: colors.primaryLight }]}>
               <Wrench size={16} color={colors.primary} />
             </View>
             <Text style={[styles.sectionCardTitle, { color: colors.textPrimary }]}>
@@ -427,7 +427,7 @@ export default function CreateJobScreen() {
             <View
               style={[
                 styles.currencyBadge,
-                { backgroundColor: isDark ? 'rgba(20, 184, 166, 0.2)' : '#CCFBF1' }
+                { backgroundColor: colors.primaryLight }
               ]}
             >
               <Text style={[styles.currencyBadgeText, { color: colors.primary }]}>
@@ -502,7 +502,7 @@ export default function CreateJobScreen() {
           ]}
         >
           <View style={styles.cardHeaderRow}>
-            <View style={[styles.cardIconCircle, { backgroundColor: isDark ? 'rgba(20, 184, 166, 0.15)' : '#CCFBF1' }]}>
+            <View style={[styles.cardIconCircle, { backgroundColor: colors.primaryLight }]}>
               <MapPin size={16} color={colors.primary} />
             </View>
             <Text style={[styles.sectionCardTitle, { color: colors.textPrimary }]}>

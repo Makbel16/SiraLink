@@ -47,7 +47,7 @@ export default function VerifyOtpScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.shieldBadge}>
-          <ShieldCheck size={32} color="#0F766E" />
+          <ShieldCheck size={32} color="#2563EB" />
         </View>
         <Text style={styles.title}>{t('otp')}</Text>
         <Text style={styles.subtitle}>
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 20,
-    backgroundColor: '#F0FDFA',
+    backgroundColor: '#DBEAFE',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16

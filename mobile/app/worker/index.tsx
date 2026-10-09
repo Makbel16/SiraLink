@@ -190,7 +190,7 @@ export default function WorkerDashboardScreen() {
             <View
               style={[
                 styles.actionIconBox,
-                { backgroundColor: isDark ? 'rgba(20, 184, 166, 0.15)' : '#F0FDFA' }
+                { backgroundColor: colors.primaryLight }
               ]}
             >
               <Briefcase size={20} color={colors.primary} />

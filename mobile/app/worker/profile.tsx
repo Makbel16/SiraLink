@@ -245,8 +245,8 @@ const styles = StyleSheet.create({
     borderColor: '#CBD5E1'
   },
   catPillActive: {
-    backgroundColor: '#0F766E',
-    borderColor: '#0F766E'
+    backgroundColor: '#2563EB',
+    borderColor: '#2563EB'
   },
   catText: {
     fontSize: 13,
@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F1F5F9',
     fontSize: 16,
     fontWeight: '800',
-    color: '#0F766E',
+    color: '#2563EB',
     borderRightWidth: 1,
     borderRightColor: '#CBD5E1'
   },

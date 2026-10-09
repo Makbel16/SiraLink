@@ -106,7 +106,7 @@ export default function MessagesTabScreen() {
       case 'alert':
         return isDark ? 'rgba(251, 191, 36, 0.15)' : '#FEF3C7';
       default:
-        return isDark ? 'rgba(20, 184, 166, 0.15)' : '#CCFBF1';
+        return colors.primaryLight;
     }
   };
 
@@ -138,7 +138,7 @@ export default function MessagesTabScreen() {
               onPress={markAllRead}
               style={[
                 styles.markAllBtn,
-                { backgroundColor: isDark ? 'rgba(20, 184, 166, 0.15)' : '#F0FDFA' }
+                { backgroundColor: colors.primaryLight }
               ]}
             >
               <CheckCheck size={14} color={colors.primary} />

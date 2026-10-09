@@ -47,9 +47,9 @@ export const lightColors: ThemeColors = {
   textPrimary: '#0F172A',
   textSecondary: '#64748B',
   textMuted: '#94A3B8',
-  primary: '#0D9488',
-  primaryLight: '#CCFBF1',
-  primaryGlow: 'rgba(13, 148, 136, 0.12)',
+  primary: '#2563EB', // Consistent Modern Royal Blue
+  primaryLight: '#DBEAFE',
+  primaryGlow: 'rgba(37, 99, 235, 0.12)',
   accent: '#F59E0B',
   accentLight: '#FEF3C7',
   accentGlow: 'rgba(245, 158, 11, 0.15)',
@@ -59,27 +59,27 @@ export const lightColors: ThemeColors = {
   successLight: '#D1FAE5',
   cardShadow: {
     shadowColor: '#64748B',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 3
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2
   }
 };
 
 export const darkColors: ThemeColors = {
   background: '#0B0F19',
   surface: '#111827',
-  surfaceCard: '#161F33',
+  surfaceCard: '#1E293B',
   surfaceSubtle: '#1E293B',
   surfaceHover: '#26354D',
-  border: '#1E293B',
+  border: '#334155',
   borderSubtle: '#172033',
   textPrimary: '#F8FAFC',
   textSecondary: '#94A3B8',
   textMuted: '#64748B',
-  primary: '#14B8A6',
-  primaryLight: '#115E59',
-  primaryGlow: 'rgba(20, 184, 166, 0.25)',
+  primary: '#3B82F6', // Clear Vibrant Blue
+  primaryLight: '#1E3A8A',
+  primaryGlow: 'rgba(59, 130, 246, 0.20)',
   accent: '#FBBF24',
   accentLight: 'rgba(251, 191, 36, 0.18)',
   accentGlow: 'rgba(251, 191, 36, 0.25)',
@@ -89,10 +89,10 @@ export const darkColors: ThemeColors = {
   successLight: 'rgba(52, 211, 153, 0.18)',
   cardShadow: {
     shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.55,
-    shadowRadius: 16,
-    elevation: 7
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    elevation: 4
   }
 };
 

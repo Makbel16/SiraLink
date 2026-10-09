@@ -43,7 +43,7 @@ export default function LanguageScreen() {
               style={[
                 styles.langCard,
                 {
-                  backgroundColor: isSelected ? (isDark ? 'rgba(20, 184, 166, 0.15)' : '#F0FDFA') : colors.surfaceCard,
+                  backgroundColor: isSelected ? (isDark ? 'rgba(59, 130, 246, 0.16)' : '#EFF6FF') : colors.surfaceCard,
                   borderColor: isSelected ? colors.primary : colors.border
                 }
               ]}
@@ -120,8 +120,8 @@ const styles = StyleSheet.create({
     elevation: 2
   },
   langCardSelected: {
-    borderColor: '#0F766E',
-    backgroundColor: '#F0FDFA'
+    borderColor: '#2563EB',
+    backgroundColor: '#EFF6FF'
   },
   langLabel: {
     fontSize: 20,
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     color: '#0F172A'
   },
   langLabelSelected: {
-    color: '#0F766E'
+    color: '#2563EB'
   },
   langSub: {
     fontSize: 14,
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: '#0F766E',
+    backgroundColor: '#2563EB',
     alignItems: 'center',
     justifyContent: 'center'
   },

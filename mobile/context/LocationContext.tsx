@@ -24,7 +24,6 @@ const DEFAULT_COORDS: LocationCoords = {
 };
 
 const LocationContext = createContext<LocationContextType | undefined>(undefined);
-
 export function LocationProvider({ children }: { children: React.ReactNode }) {
   const [currentLocation, setCurrentLocation] = useState<LocationCoords>(DEFAULT_COORDS);
   const [permissionStatus, setPermissionStatus] = useState<Location.PermissionStatus | null>(null);

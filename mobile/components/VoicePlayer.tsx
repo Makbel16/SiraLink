@@ -1,8 +1,10 @@
+import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Platform } from 'react-native';
 import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-audio';
 import { Play, Pause, Volume2 } from 'lucide-react-native';
 import { api } from '../services/api';
 import { useTranslation } from '../utils/i18n';
+import { useTheme } from '../context/ThemeContext';
 
 interface VoicePlayerProps {
   audioUrl: string;
@@ -10,6 +12,7 @@ interface VoicePlayerProps {
 }
 
 export function VoicePlayer({ audioUrl, title }: VoicePlayerProps) {
+  const { colors, isDark } = useTheme();
   const { t } = useTranslation();
   const displayTitle = title || t('voice_note_title');
   const resolvedUrl = api.resolveMediaUrl(audioUrl);
@@ -59,36 +62,44 @@ export function VoicePlayer({ audioUrl, title }: VoicePlayerProps) {
   const progressPercent = durationSec > 0 ? Math.min(100, (currentTimeSec / durationSec) * 100) : 0;
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: isDark ? colors.surfaceSubtle : '#EFF6FF',
+          borderColor: isDark ? colors.border : '#DBEAFE'
+        }
+      ]}
+    >
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={togglePlay}
         disabled={isLoading}
-        style={styles.playButton}
+        style={[styles.playButton, { backgroundColor: colors.primary }]}
       >
         {isLoading ? (
           <ActivityIndicator size="small" color="#FFFFFF" />
         ) : isPlaying ? (
-          <Pause size={20} color="#FFFFFF" fill="#FFFFFF" />
+          <Pause size={18} color="#FFFFFF" fill="#FFFFFF" />
         ) : (
-          <Play size={20} color="#FFFFFF" fill="#FFFFFF" />
+          <Play size={18} color="#FFFFFF" fill="#FFFFFF" />
         )}
       </TouchableOpacity>
 
       <View style={styles.progressSection}>
         <View style={styles.headerRow}>
           <View style={styles.titleRow}>
-            <Volume2 size={14} color="#0F766E" />
-            <Text style={styles.titleText}>{displayTitle}</Text>
+            <Volume2 size={14} color={colors.primary} />
+            <Text style={[styles.titleText, { color: colors.primary }]}>{displayTitle}</Text>
           </View>
-          <Text style={styles.timeText}>
+          <Text style={[styles.timeText, { color: colors.textSecondary }]}>
             {formatTime(currentTimeSec)} / {formatTime(durationSec)}
           </Text>
         </View>
 
         {/* Progress Bar */}
-        <View style={styles.track}>
-          <View style={[styles.fill, { width: `${progressPercent}%` }]} />
+        <View style={[styles.track, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0' }]}>
+          <View style={[styles.fill, { width: `${progressPercent}%`, backgroundColor: colors.primary }]} />
         </View>
       </View>
     </View>
@@ -99,18 +110,15 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F0FDFA',
     borderWidth: 1,
-    borderColor: '#CCFBF1',
     borderRadius: 16,
     padding: 12,
     gap: 12
   },
   playButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#0F766E',
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     alignItems: 'center',
     justifyContent: 'center'
   },
@@ -130,23 +138,19 @@ const styles = StyleSheet.create({
   },
   titleText: {
     fontSize: 13,
-    fontWeight: '700',
-    color: '#0F766E'
+    fontWeight: '700'
   },
   timeText: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#64748B'
+    fontWeight: '600'
   },
   track: {
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#E2E8F0',
     overflow: 'hidden'
   },
   fill: {
     height: '100%',
-    backgroundColor: '#0F766E',
     borderRadius: 3
   }
 });

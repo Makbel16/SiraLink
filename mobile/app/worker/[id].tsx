@@ -65,7 +65,7 @@ export default function WorkerProfileScreen() {
             style={[
               styles.skillCategoryBadge,
               {
-                backgroundColor: isDark ? 'rgba(20, 184, 166, 0.18)' : '#F0FDFA',
+                backgroundColor: colors.primaryLight,
                 color: colors.primary
               }
             ]}
@@ -186,8 +186,8 @@ const styles = StyleSheet.create({
   skillCategoryBadge: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#0F766E',
-    backgroundColor: '#F0FDFA',
+    color: '#2563EB',
+    backgroundColor: '#DBEAFE',
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 8,
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
   distanceText: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#0F766E'
+    color: '#2563EB'
   },
   statsGrid: {
     flexDirection: 'row',
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 18,
     fontWeight: '800',
-    color: '#0F766E'
+    color: '#2563EB'
   },
   section: {
     marginBottom: 20

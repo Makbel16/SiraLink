@@ -57,7 +57,7 @@ export default function LoginScreen() {
           onPress={() => setRole('CLIENT')}
           style={[styles.roleOption, role === 'CLIENT' && styles.roleOptionActive]}
         >
-          <User size={18} color={role === 'CLIENT' ? '#0F766E' : '#64748B'} />
+          <User size={18} color={role === 'CLIENT' ? '#2563EB' : '#64748B'} />
           <Text style={[styles.roleText, role === 'CLIENT' && styles.roleTextActive]}>
             {t('client')}
           </Text>
@@ -68,7 +68,7 @@ export default function LoginScreen() {
           onPress={() => setRole('WORKER')}
           style={[styles.roleOption, role === 'WORKER' && styles.roleOptionActive]}
         >
-          <Briefcase size={18} color={role === 'WORKER' ? '#0F766E' : '#64748B'} />
+          <Briefcase size={18} color={role === 'WORKER' ? '#2563EB' : '#64748B'} />
           <Text style={[styles.roleText, role === 'WORKER' && styles.roleTextActive]}>
             {t('worker')}
           </Text>
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     color: '#64748B'
   },
   roleTextActive: {
-    color: '#0F766E',
+    color: '#2563EB',
     fontWeight: '800'
   },
   form: {

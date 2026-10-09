@@ -64,7 +64,7 @@ export default function SettingsScreen() {
               <View
                 style={[
                   styles.iconCircle,
-                  { backgroundColor: isDark ? 'rgba(20, 184, 166, 0.15)' : '#F0FDFA' }
+                  { backgroundColor: colors.primaryLight }
                 ]}
               >
                 <Server size={20} color={colors.primary} />

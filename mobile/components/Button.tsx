@@ -1,4 +1,6 @@
+import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, ViewStyle, TextStyle } from 'react-native';
+import { useTheme } from '../context/ThemeContext';
 
 interface ButtonProps {
   title: string;
@@ -23,25 +25,48 @@ export function Button({
   textStyle,
   icon
 }: ButtonProps) {
+  const { colors, isDark } = useTheme();
+
   const getContainerStyle = () => {
     switch (variant) {
       case 'secondary':
-        return styles.secondaryContainer;
+        return [
+          styles.secondaryContainer,
+          { backgroundColor: isDark ? colors.surfaceSubtle : '#F1F5F9' }
+        ];
       case 'danger':
-        return styles.dangerContainer;
+        return [
+          styles.dangerContainer,
+          { backgroundColor: colors.danger }
+        ];
       case 'outline':
-        return styles.outlineContainer;
+        return [
+          styles.outlineContainer,
+          { borderColor: colors.primary }
+        ];
       default:
-        return styles.primaryContainer;
+        return [
+          styles.primaryContainer,
+          {
+            backgroundColor: colors.primary,
+            shadowColor: colors.primary
+          }
+        ];
     }
   };
 
   const getTextStyle = () => {
     switch (variant) {
       case 'secondary':
-        return styles.secondaryText;
+        return [
+          styles.secondaryText,
+          { color: colors.textPrimary }
+        ];
       case 'outline':
-        return styles.outlineText;
+        return [
+          styles.outlineText,
+          { color: colors.primary }
+        ];
       case 'danger':
       default:
         return styles.primaryText;
@@ -51,11 +76,11 @@ export function Button({
   const getSizeStyle = () => {
     switch (size) {
       case 'sm':
-        return { paddingVertical: 8, paddingHorizontal: 14, minHeight: 38 };
+        return { paddingVertical: 8, paddingHorizontal: 14, minHeight: 38, borderRadius: 10 };
       case 'lg':
-        return { paddingVertical: 18, paddingHorizontal: 28, minHeight: 60 };
+        return { paddingVertical: 16, paddingHorizontal: 28, minHeight: 56, borderRadius: 16 };
       default:
-        return { paddingVertical: 14, paddingHorizontal: 22, minHeight: 50 };
+        return { paddingVertical: 13, paddingHorizontal: 20, minHeight: 48, borderRadius: 14 };
     }
   };
 
@@ -73,7 +98,7 @@ export function Button({
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={variant === 'outline' || variant === 'secondary' ? '#0F172A' : '#FFFFFF'} />
+        <ActivityIndicator color={variant === 'outline' || variant === 'secondary' ? colors.textPrimary : '#FFFFFF'} />
       ) : (
         <>
           {icon}
@@ -95,26 +120,23 @@ const styles = StyleSheet.create({
     gap: 8
   },
   primaryContainer: {
-    backgroundColor: '#0F766E', // Rich Emerald Teal
-    shadowColor: '#0F766E',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 4
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 3
   },
   secondaryContainer: {
-    backgroundColor: '#E2E8F0'
+    backgroundColor: '#F1F5F9'
   },
   dangerContainer: {
     backgroundColor: '#DC2626'
   },
   outlineContainer: {
     backgroundColor: 'transparent',
-    borderWidth: 1.5,
-    borderColor: '#0F766E'
+    borderWidth: 1.5
   },
   baseText: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700'
   },
   primaryText: {
@@ -123,11 +145,9 @@ const styles = StyleSheet.create({
   secondaryText: {
     color: '#1E293B'
   },
-  outlineText: {
-    color: '#0F766E'
-  },
+  outlineText: {},
   lgText: {
-    fontSize: 18
+    fontSize: 17
   },
   disabled: {
     opacity: 0.55

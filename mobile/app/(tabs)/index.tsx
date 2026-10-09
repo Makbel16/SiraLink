@@ -57,7 +57,7 @@ export default function ClientHomeScreen() {
       })
   });
 
-  // Rich 3D Category Data with tailored gradients, tags, and price baselines
+  // Category Data with clean consistent metadata
   const categoryCards: CategoryItemData[] = [
     {
       key: undefined,
@@ -67,9 +67,7 @@ export default function ClientHomeScreen() {
       workerCount: 140,
       startingPrice: 300,
       tag: t('all_services_tag'),
-      tagKey: 'all_services_tag',
-      gradient: ['#F0FDFA', '#CCFBF1'],
-      darkGradient: ['#162036', '#0F172A']
+      tagKey: 'all_services_tag'
     },
     {
       key: 'PLUMBING',
@@ -79,9 +77,7 @@ export default function ClientHomeScreen() {
       workerCount: 48,
       startingPrice: 350,
       tag: t('popular_tag'),
-      tagKey: 'popular_tag',
-      gradient: ['#ECFEFF', '#CFFAFE'],
-      darkGradient: ['#0E2A38', '#081B26']
+      tagKey: 'popular_tag'
     },
     {
       key: 'ELECTRICAL',
@@ -91,9 +87,7 @@ export default function ClientHomeScreen() {
       workerCount: 36,
       startingPrice: 400,
       tag: t('fast_call_tag'),
-      tagKey: 'fast_call_tag',
-      gradient: ['#FFFBEB', '#FEF3C7'],
-      darkGradient: ['#2E2208', '#1A1303']
+      tagKey: 'fast_call_tag'
     },
     {
       key: 'CLEANING',
@@ -103,9 +97,7 @@ export default function ClientHomeScreen() {
       workerCount: 52,
       startingPrice: 250,
       tag: t('trusted_tag'),
-      tagKey: 'trusted_tag',
-      gradient: ['#EFF6FF', '#DBEAFE'],
-      darkGradient: ['#0F2445', '#081426']
+      tagKey: 'trusted_tag'
     },
     {
       key: 'PAINTING',
@@ -115,9 +107,7 @@ export default function ClientHomeScreen() {
       workerCount: 29,
       startingPrice: 450,
       tag: t('quality_tag'),
-      tagKey: 'quality_tag',
-      gradient: ['#FAF5FF', '#F3E8FF'],
-      darkGradient: ['#26153B', '#150A21']
+      tagKey: 'quality_tag'
     },
     {
       key: 'CARPENTRY',
@@ -127,9 +117,7 @@ export default function ClientHomeScreen() {
       workerCount: 31,
       startingPrice: 400,
       tag: t('quality_tag'),
-      tagKey: 'quality_tag',
-      gradient: ['#FFF7ED', '#FFEDD5'],
-      darkGradient: ['#2D1A0C', '#1A0E06']
+      tagKey: 'quality_tag'
     },
     {
       key: 'MECHANIC',
@@ -139,9 +127,7 @@ export default function ClientHomeScreen() {
       workerCount: 24,
       startingPrice: 500,
       tag: t('speed_tag'),
-      tagKey: 'speed_tag',
-      gradient: ['#FEF2F2', '#FEE2E2'],
-      darkGradient: ['#301010', '#1C0808']
+      tagKey: 'speed_tag'
     },
     {
       key: 'CONSTRUCTION',
@@ -151,9 +137,7 @@ export default function ClientHomeScreen() {
       workerCount: 42,
       startingPrice: 450,
       tag: t('quality_tag'),
-      tagKey: 'quality_tag',
-      gradient: ['#FFF1F2', '#FFE4E6'],
-      darkGradient: ['#2A1016', '#17080B']
+      tagKey: 'quality_tag'
     },
     {
       key: 'MOVING',
@@ -163,9 +147,7 @@ export default function ClientHomeScreen() {
       workerCount: 19,
       startingPrice: 600,
       tag: t('trusted_tag'),
-      tagKey: 'trusted_tag',
-      gradient: ['#F0FDF4', '#DCFCE7'],
-      darkGradient: ['#0C2918', '#06170D']
+      tagKey: 'trusted_tag'
     },
     {
       key: 'GARDENING',
@@ -175,9 +157,7 @@ export default function ClientHomeScreen() {
       workerCount: 22,
       startingPrice: 300,
       tag: t('quality_tag'),
-      tagKey: 'quality_tag',
-      gradient: ['#F7FEE7', '#ECFCCB'],
-      darkGradient: ['#1C2608', '#0E1404']
+      tagKey: 'quality_tag'
     }
   ];
 
@@ -273,7 +253,7 @@ export default function ClientHomeScreen() {
         >
           {/* Subtle Ambient Radial Backlight */}
           <LinearGradient
-            colors={isDark ? ['rgba(20, 184, 166, 0.12)', 'transparent'] : ['rgba(20, 184, 166, 0.08)', 'transparent']}
+            colors={isDark ? ['rgba(59, 130, 246, 0.12)', 'transparent'] : ['rgba(37, 99, 235, 0.08)', 'transparent']}
             style={styles.ambientGlowEffect}
           />
 
@@ -386,7 +366,7 @@ export default function ClientHomeScreen() {
                 <View
                   style={[
                     styles.popularBadge,
-                    { backgroundColor: isDark ? 'rgba(20, 184, 166, 0.18)' : '#CCFBF1' }
+                    { backgroundColor: colors.primaryLight }
                   ]}
                 >
                   <Award size={12} color={colors.primary} />

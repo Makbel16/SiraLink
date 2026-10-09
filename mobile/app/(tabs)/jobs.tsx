@@ -44,9 +44,6 @@ interface StatusCardData {
   countKey: 'all' | 'active' | 'completed';
   tag: string;
   footerLabel: string;
-  accentColor: string;
-  gradient: [string, string];
-  darkGradient: [string, string];
 }
 
 interface StatusCard3DProps {
@@ -57,169 +54,131 @@ interface StatusCard3DProps {
 }
 
 /**
- * 3D Animated Status Filter Card
- * Styled identically to CategoryCard3D with tactile spring physics,
- * glassmorphic tag pills, 3D floating emoji bubble, and live job counters.
+ * Modern Clean Status Filter Card
+ * Clean borders, subtle shadows, and cohesive brand palette.
  */
 function StatusCard3D({ item, count, isSelected, onPress }: StatusCard3DProps) {
   const { colors, isDark } = useTheme();
-  const scaleAnim = useRef(new Animated.Value(1)).current;
-
-  const handlePressIn = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 0.94,
-      tension: 100,
-      friction: 6,
-      useNativeDriver: true
-    }).start();
-  };
-
-  const handlePressOut = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 1,
-      tension: 80,
-      friction: 5,
-      useNativeDriver: true
-    }).start();
-  };
-
-  const activeGradient = isDark ? item.darkGradient : item.gradient;
-  const activeBorderColor = isSelected
-    ? item.accentColor
-    : isDark
-    ? 'rgba(255, 255, 255, 0.1)'
-    : 'rgba(0, 0, 0, 0.06)';
 
   return (
-    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-      <TouchableOpacity
-        activeOpacity={1}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        onPress={onPress}
-        style={[
-          styles.statusCardContainer,
-          { borderColor: activeBorderColor },
-          isSelected && [
-            styles.statusCardSelected,
-            { shadowColor: item.accentColor, borderColor: item.accentColor }
-          ]
-        ]}
-      >
-        <LinearGradient
-          colors={activeGradient}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.statusGradient}
+    <TouchableOpacity
+      activeOpacity={0.75}
+      onPress={onPress}
+      style={[
+        styles.statusCardContainer,
+        {
+          backgroundColor: isSelected
+            ? (isDark ? 'rgba(59, 130, 246, 0.16)' : '#EFF6FF')
+            : colors.surfaceCard,
+          borderColor: isSelected ? colors.primary : colors.border
+        },
+        colors.cardShadow
+      ]}
+    >
+      {/* Top Tag & Active Check */}
+      <View style={styles.cardTopRow}>
+        <View
+          style={[
+            styles.cardTagPill,
+            {
+              backgroundColor: isSelected
+                ? colors.primary
+                : (isDark ? colors.surfaceSubtle : '#F1F5F9')
+            }
+          ]}
         >
-          {/* Top Tag & Active Check */}
-          <View style={styles.cardTopRow}>
-            <View
-              style={[
-                styles.cardTagPill,
-                {
-                  backgroundColor: isDark
-                    ? 'rgba(0, 0, 0, 0.48)'
-                    : 'rgba(255, 255, 255, 0.85)'
-                }
-              ]}
-            >
-              <Text
-                style={[
-                  styles.cardTagText,
-                  { color: isDark ? '#FDE047' : '#B45309' }
-                ]}
-              >
-                {item.tag}
-              </Text>
-            </View>
-          </View>
-
-          {/* 3D Floating Emoji Bubble */}
-          <View style={styles.iconCenterWrapper}>
-            <View
-              style={[
-                styles.emojiBubble,
-                {
-                  backgroundColor: isDark
-                    ? 'rgba(255, 255, 255, 0.12)'
-                    : 'rgba(255, 255, 255, 0.95)',
-                  shadowColor: isDark ? '#000000' : item.accentColor
-                }
-              ]}
-            >
-              <Text style={styles.cardEmoji}>{item.emoji}</Text>
-            </View>
-          </View>
-
-          {/* Localized Title & Subtitle */}
-          <View style={styles.cardTitles}>
-            <Text
-              style={[styles.mainCardTitle, { color: colors.textPrimary }]}
-              numberOfLines={1}
-            >
-              {item.label}
-            </Text>
-            <Text
-              style={[styles.subCardTitle, { color: colors.textSecondary }]}
-              numberOfLines={1}
-            >
-              {item.subLabel}
-            </Text>
-          </View>
-
-          {/* Card Footer with Details & Big Bold Count */}
-          <View
+          <Text
             style={[
-              styles.cardFooter,
-              {
-                borderTopColor: isDark
-                  ? 'rgba(255, 255, 255, 0.08)'
-                  : 'rgba(0, 0, 0, 0.06)'
-              }
+              styles.cardTagText,
+              { color: isSelected ? '#FFFFFF' : colors.textSecondary }
             ]}
           >
-            <View style={styles.footerLabelGroup}>
-              {item.id === 'ALL' ? (
-                <Briefcase size={12} color={colors.textSecondary} />
-              ) : item.id === 'ACTIVE' ? (
-                <Clock size={12} color={item.accentColor} />
-              ) : (
-                <CheckCircle2 size={12} color={item.accentColor} />
-              )}
-              <Text
-                style={[styles.footerText, { color: colors.textSecondary }]}
-                numberOfLines={1}
-              >
-                {item.footerLabel}
-              </Text>
-            </View>
+            {item.tag}
+          </Text>
+        </View>
+      </View>
 
-            <View
-              style={[
-                styles.countBadge,
-                {
-                  backgroundColor: isSelected
-                    ? item.accentColor
-                    : isDark
-                    ? 'rgba(255, 255, 255, 0.1)'
-                    : 'rgba(0, 0, 0, 0.06)'
-                }
-              ]}
-            >
-              <Text
-                style={[
-                  styles.countNumber,
-                  { color: isSelected ? '#FFFFFF' : colors.textPrimary }
-                ]}
-              >
-                {count}
-              </Text>
-            </View>
-          </View>
-        </LinearGradient>
-      </TouchableOpacity>
-    </Animated.View>
+      {/* Flat Icon Badge */}
+      <View style={styles.iconCenterWrapper}>
+        <View
+          style={[
+            styles.emojiBubble,
+            {
+              backgroundColor: isSelected
+                ? (isDark ? 'rgba(59, 130, 246, 0.25)' : '#DBEAFE')
+                : colors.surfaceSubtle
+            }
+          ]}
+        >
+          <Text style={styles.cardEmoji}>{item.emoji}</Text>
+        </View>
+      </View>
+
+      {/* Localized Title & Subtitle */}
+      <View style={styles.cardTitles}>
+        <Text
+          style={[
+            styles.mainCardTitle,
+            { color: isSelected ? colors.primary : colors.textPrimary }
+          ]}
+          numberOfLines={1}
+        >
+          {item.label}
+        </Text>
+        <Text
+          style={[styles.subCardTitle, { color: colors.textSecondary }]}
+          numberOfLines={1}
+        >
+          {item.subLabel}
+        </Text>
+      </View>
+
+      {/* Card Footer with Details & Bold Count */}
+      <View
+        style={[
+          styles.cardFooter,
+          {
+            borderTopColor: colors.borderSubtle
+          }
+        ]}
+      >
+        <View style={styles.footerLabelGroup}>
+          {item.id === 'ALL' ? (
+            <Briefcase size={12} color={isSelected ? colors.primary : colors.textSecondary} />
+          ) : item.id === 'ACTIVE' ? (
+            <Clock size={12} color={isSelected ? colors.primary : colors.textSecondary} />
+          ) : (
+            <CheckCircle2 size={12} color={isSelected ? colors.primary : colors.textSecondary} />
+          )}
+          <Text
+            style={[styles.footerText, { color: colors.textSecondary }]}
+            numberOfLines={1}
+          >
+            {item.footerLabel}
+          </Text>
+        </View>
+
+        <View
+          style={[
+            styles.countBadge,
+            {
+              backgroundColor: isSelected
+                ? colors.primary
+                : colors.surfaceSubtle
+            }
+          ]}
+        >
+          <Text
+            style={[
+              styles.countNumber,
+              { color: isSelected ? '#FFFFFF' : colors.textPrimary }
+            ]}
+          >
+            {count}
+          </Text>
+        </View>
+      </View>
+    </TouchableOpacity>
   );
 }
 
@@ -264,10 +223,7 @@ export default function JobsTabScreen() {
       emoji: '📋',
       countKey: 'all',
       tag: `⭐ ${t('tag_all')}`,
-      footerLabel: t('total_jobs'),
-      accentColor: colors.primary,
-      gradient: ['#F0FDFA', '#CCFBF1'],
-      darkGradient: ['#16253B', '#0F1826']
+      footerLabel: t('total_jobs')
     },
     {
       id: 'ACTIVE',
@@ -276,10 +232,7 @@ export default function JobsTabScreen() {
       emoji: '⚡',
       countKey: 'active',
       tag: `🔥 ${t('tag_pending')}`,
-      footerLabel: t('tag_pending'),
-      accentColor: '#D97706',
-      gradient: ['#FFFBEB', '#FEF3C7'],
-      darkGradient: ['#2E1E05', '#1B1102']
+      footerLabel: t('tag_pending')
     },
     {
       id: 'COMPLETED',
@@ -288,10 +241,7 @@ export default function JobsTabScreen() {
       emoji: '🏆',
       countKey: 'completed',
       tag: `🎉 ${t('tag_completed')}`,
-      footerLabel: t('completed_filter'),
-      accentColor: '#059669',
-      gradient: ['#F0FDF4', '#DCFCE7'],
-      darkGradient: ['#0A2917', '#05180D']
+      footerLabel: t('completed_filter')
     }
   ];
 
@@ -323,14 +273,11 @@ export default function JobsTabScreen() {
           <View style={styles.headerLeftCol}>
             {/* 3D App Icon Badge */}
             <View style={styles.headerBrandBadgeRow}>
-              <LinearGradient
-                colors={[colors.primary, '#0f766e']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.headerIconBubble}
+              <View
+                style={[styles.headerIconBubble, { backgroundColor: colors.primary }]}
               >
                 <Briefcase size={20} color="#FFFFFF" />
-              </LinearGradient>
+              </View>
 
               <View>
                 <View style={styles.titleWithBadge}>
@@ -342,9 +289,7 @@ export default function JobsTabScreen() {
                     style={[
                       styles.liveIndicatorPill,
                       {
-                        backgroundColor: isDark
-                          ? 'rgba(20, 184, 166, 0.16)'
-                          : '#CCFBF1'
+                        backgroundColor: colors.primaryLight
                       }
                     ]}
                   >
@@ -364,21 +309,18 @@ export default function JobsTabScreen() {
             </View>
           </View>
 
-          {/* "+ New Job" Gradient Action Button */}
+          {/* "+ New Job" Action Button */}
           <TouchableOpacity
             activeOpacity={0.85}
             onPress={() => router.push('/job/create')}
             style={styles.newJobBtnWrap}
           >
-            <LinearGradient
-              colors={[colors.primary, '#047857']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.newJobGradient}
+            <View
+              style={[styles.newJobGradient, { backgroundColor: colors.primary }]}
             >
               <Plus size={16} color="#FFFFFF" strokeWidth={2.5} />
               <Text style={styles.newJobText}>{t('post_job')}</Text>
-            </LinearGradient>
+            </View>
           </TouchableOpacity>
         </View>
 
@@ -400,7 +342,7 @@ export default function JobsTabScreen() {
               styles.metricItem,
               filter === 'ALL' && [
                 styles.metricItemActive,
-                { backgroundColor: isDark ? 'rgba(20, 184, 166, 0.15)' : '#F0FDFA' }
+                { backgroundColor: colors.primaryLight }
               ]
             ]}
           >
@@ -560,9 +502,7 @@ export default function JobsTabScreen() {
                 style={[
                   styles.countPill,
                   {
-                    backgroundColor: isDark
-                      ? 'rgba(20, 184, 166, 0.15)'
-                      : '#CCFBF1'
+                    backgroundColor: colors.primaryLight
                   }
                 ]}
               >
@@ -665,11 +605,11 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#0D9488',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5
+    shadowColor: '#2563EB',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 5,
+    elevation: 3
   },
   titleWithBadge: {
     flexDirection: 'row',
@@ -706,11 +646,11 @@ const styles = StyleSheet.create({
   newJobBtnWrap: {
     borderRadius: 16,
     overflow: 'hidden',
-    shadowColor: '#0D9488',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
-    shadowRadius: 8,
-    elevation: 5
+    shadowColor: '#2563EB',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 3
   },
   newJobGradient: {
     flexDirection: 'row',
@@ -807,34 +747,18 @@ const styles = StyleSheet.create({
     marginTop: 3,
     fontWeight: '500'
   },
-  // 3D Status Cards Scroll (Category Card Style)
+  // Status Cards Scroll
   statusCardsScroll: {
     gap: 12,
     paddingVertical: 8,
     paddingRight: 10
   },
   statusCardContainer: {
-    width: 154,
-    height: 204,
-    borderRadius: 24,
+    width: 148,
+    height: 180,
+    borderRadius: 18,
     borderWidth: 1.5,
-    overflow: 'hidden',
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    elevation: 6
-  },
-  statusCardSelected: {
-    borderWidth: 2,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.38,
-    shadowRadius: 16,
-    elevation: 8
-  },
-  statusGradient: {
-    flex: 1,
-    padding: 13,
+    padding: 12,
     justifyContent: 'space-between'
   },
   cardTopRow: {
@@ -845,34 +769,26 @@ const styles = StyleSheet.create({
   },
   cardTagPill: {
     paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 8,
-    borderWidth: 0.5,
-    borderColor: 'rgba(255, 255, 255, 0.25)'
+    paddingVertical: 2.5,
+    borderRadius: 6
   },
   cardTagText: {
     fontSize: 10,
-    fontWeight: '800'
+    fontWeight: '700'
   },
   iconCenterWrapper: {
     alignItems: 'center',
     marginVertical: 4
   },
   emojiBubble: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 50,
+    height: 50,
+    borderRadius: 16,
     alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.45)',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 5
+    justifyContent: 'center'
   },
   cardEmoji: {
-    fontSize: 28
+    fontSize: 26
   },
   cardTitles: {
     alignItems: 'center',

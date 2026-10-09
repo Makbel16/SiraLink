@@ -30,7 +30,7 @@ export default function EntryScreen() {
       </View>
       <Text style={styles.brandTitle}>{t('app_name')}</Text>
       <Text style={styles.brandSubtitle}>{t('app_brand_country')}</Text>
-      <ActivityIndicator size="large" color="#0F766E" style={{ marginTop: 28 }} />
+      <ActivityIndicator size="large" color="#2563EB" style={{ marginTop: 28 }} />
     </View>
   );
 }
@@ -47,15 +47,15 @@ const styles = StyleSheet.create({
     width: 88,
     height: 88,
     borderRadius: 24,
-    backgroundColor: '#0F766E',
+    backgroundColor: '#2563EB',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
-    shadowColor: '#0F766E',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
-    elevation: 8
+    shadowColor: '#2563EB',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 4
   },
   logoText: {
     fontSize: 40,

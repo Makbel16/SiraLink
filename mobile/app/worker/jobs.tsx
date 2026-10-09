@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
   categoryText: {
     fontSize: 12,
     fontWeight: '800',
-    color: '#0F766E'
+    color: '#2563EB'
   },
   titleText: {
     fontSize: 16,
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
   priceText: {
     fontSize: 16,
     fontWeight: '900',
-    color: '#0F766E'
+    color: '#2563EB'
   },
   actionRow: {
     flexDirection: 'row',

@@ -150,8 +150,8 @@ export default function WorkerJobDetailScreen() {
             style={[
               styles.priceRow,
               {
-                backgroundColor: isDark ? '#142834' : '#F0FDFA',
-                borderColor: isDark ? 'rgba(20, 184, 166, 0.3)' : '#CCFBF1'
+                backgroundColor: isDark ? colors.surfaceSubtle : '#EFF6FF',
+                borderColor: isDark ? colors.border : '#DBEAFE'
               }
             ]}
           >
@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
   categoryText: {
     fontSize: 13,
     fontWeight: '800',
-    color: '#0F766E'
+    color: '#2563EB'
   },
   titleText: {
     fontSize: 18,
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#0F766E',
+    backgroundColor: '#2563EB',
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 12
@@ -282,22 +282,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#F0FDFA',
+    backgroundColor: '#EFF6FF',
     padding: 16,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#CCFBF1',
+    borderColor: '#DBEAFE',
     marginBottom: 20
   },
   priceLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#0F766E'
+    color: '#2563EB'
   },
   priceValue: {
     fontSize: 18,
     fontWeight: '900',
-    color: '#0F766E'
+    color: '#2563EB'
   },
   actionsContainer: {
     marginTop: 10

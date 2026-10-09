@@ -61,8 +61,8 @@ export function JobCard({ job, onPress, isWorkerPerspective = false }: JobCardPr
           style={[
             styles.categoryPill,
             {
-              backgroundColor: isDark ? 'rgba(20, 184, 166, 0.15)' : '#F0FDFA',
-              borderColor: isDark ? 'rgba(20, 184, 166, 0.3)' : '#CCFBF1'
+              backgroundColor: isDark ? colors.surfaceSubtle : '#EFF6FF',
+              borderColor: isDark ? colors.border : '#DBEAFE'
             }
           ]}
         >
@@ -96,7 +96,7 @@ export function JobCard({ job, onPress, isWorkerPerspective = false }: JobCardPr
               style={[
                 styles.pricePill,
                 {
-                  backgroundColor: isDark ? 'rgba(20, 184, 166, 0.18)' : '#CCFBF1'
+                  backgroundColor: colors.primaryLight
                 }
               ]}
             >
